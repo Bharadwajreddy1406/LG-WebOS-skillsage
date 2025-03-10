@@ -1,0 +1,10 @@
+{
+  "id": "com.demo.app",
+  "version": "1.0.0",
+  "vendor": "My Company",
+  "type": "web",
+  "main": "index.html",
+  "title": "webos-1",
+  "icon": "icon.png",
+  "largeIcon": "largeIcon.png"
+}
