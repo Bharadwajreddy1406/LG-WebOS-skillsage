@@ -4,6 +4,8 @@ import Panels from '@enact/sandstone/Panels';
 
 import MainPanel from '../views/MainPanel';
 
+import './attachErrorHandler';
+
 import css from './App.module.less';
 
 const App = kind({
@@ -15,11 +17,9 @@ const App = kind({
 	},
 
 	render: (props) => (
-		<div {...props}>
-			<Panels>
-				<MainPanel />
-			</Panels>
-		</div>
+		<Panels {...props}>
+			<MainPanel />
+		</Panels>
 	)
 });
 
