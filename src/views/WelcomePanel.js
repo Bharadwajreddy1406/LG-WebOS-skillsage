@@ -15,7 +15,7 @@ const WelcomePanel = kind({
 				<Header
 					style={{
 						background: 'linear-gradient(to right, #1F1F1F, #000000)',
-						padding: '0 30px'
+						padding: '0px 50px'
 					}}
 				>
 					{/* Left side: Icon & Title */}
