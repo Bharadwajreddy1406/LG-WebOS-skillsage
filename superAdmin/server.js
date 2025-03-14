@@ -3,11 +3,16 @@ const mqtt = require('mqtt');
 const path = require('path');
 const router = require('./routes');
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 4000;
+const cors = require('cors');
 
 // Middleware setup for parsing form data
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(cors(
+  {origin: true,
+  credentials: true,}
+));
 app.use(router);
 // Serve static files from 'public' directory
 app.use(express.static(path.join(__dirname, 'public')));

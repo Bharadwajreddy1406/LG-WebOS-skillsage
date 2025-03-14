@@ -17,7 +17,7 @@ const App = (props) => {
   const fetchStudentData = async (roll) => {
     try {
       // Replace with your actual API endpoint
-      const response = await fetch(`http://localhost:5000/api/v1/god/getAllColleges`);
+      const response = await fetch(`http://localhost:4000/projects`);
       
       if (!response.ok) {
         throw new Error(`API responded with status: ${response.status}`);
