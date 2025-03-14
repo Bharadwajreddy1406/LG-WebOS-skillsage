@@ -1,13 +1,14 @@
 const express = require('express');
 const mqtt = require('mqtt');
 const path = require('path');
+const router = require('./routes');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware setup for parsing form data
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-
+app.use(router);
 // Serve static files from 'public' directory
 app.use(express.static(path.join(__dirname, 'public')));
 

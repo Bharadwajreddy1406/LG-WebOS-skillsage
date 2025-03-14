@@ -14,7 +14,7 @@ const MainPanel = kind({
 
   render: ({ connected, rollNumber, studentData, error, ...rest }) => {
     return (
-      <Panel {...rest}>
+      <Panel  {...rest}>
         <Header title="Student Information System">
           <Icon>
             {connected ? 'connection' : 'notification'}
