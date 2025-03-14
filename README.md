@@ -1,7 +1,7 @@
 This project was bootstrapped with [@enact/cli](https://github.com/enactjs/cli).
 
 Below you will find some information on how to perform common tasks.
-You can find the most recent version of this guide [here](https://github.com/enactjs/templates/blob/master/packages/webostv/template/README.md).
+You can find the most recent version of this guide [here](https://github.com/enactjs/templates/blob/master/packages/sandstone/template/README.md).
 Additional documentation on @enact/cli can be found [here](https://github.com/enactjs/cli/blob/master/docs/index.md).
 
 ## Folder Structure
@@ -25,7 +25,6 @@ my-app/
     index.js
     reportWebVitals.js
   resources/
-  webos-meta/
 ```
 
 For the project to build, **these files must exist with exact filenames**:
