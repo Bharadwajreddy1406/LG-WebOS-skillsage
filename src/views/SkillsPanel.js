@@ -17,9 +17,24 @@ import {
 // Register the required Chart.js components
 ChartJS.register(RadialLinearScale, ArcElement, Tooltip, Legend);
 
-// Create a custom plugin for labels positioned above each sector
-const centerLabelsPlugin = {
-  id: 'centerLabels',
+// Define custom colors for the chart
+const COLORS = [
+  '#C94C4C', // Warm Brick Red  
+  '#D3756B', // Muted Coral  
+  '#DC8850', // Deep Sunset Orange  
+  '#E3A857', // Rich Goldenrod  
+  '#A9845C', // Earthy Sandstone  
+  '#7D9D72', // Soft Olive Green  
+  '#5F8575', // Muted Teal  
+  '#4F759B', // Dusty Blue  
+  '#4464AD', // Royal Blue  
+  '#7158A1', // Deep Lavender  
+  '#9A4785', // Muted Plum  
+];
+
+// Create a custom plugin for extending path labels
+const extendedPathLabelsPlugin = {
+  id: 'extendedPathLabels',
   afterDatasetDraw: (chart) => {
     const { ctx, data, chartArea, scales } = chart;
     
@@ -30,76 +45,71 @@ const centerLabelsPlugin = {
     const centerX = (chartArea.left + chartArea.right) / 2;
     const centerY = (chartArea.top + chartArea.bottom) / 2;
     
-    // Extract skill labels
+    // Extract skill labels and values
     const labels = data.labels;
     const dataset = data.datasets[0];
+    const total = dataset.data.reduce((sum, value) => sum + value, 0);
     
     // Loop through each data point
     labels.forEach((label, index) => {
-      // Calculate position for the label
+      // Calculate the angle for this data point (midpoint of the sector)
       const numItems = labels.length;
       const angleSize = (Math.PI * 2) / numItems;
-      const angle = index * angleSize - Math.PI / 2 + (angleSize / 2); // Center in the segment
+      const midAngle = index * angleSize - Math.PI / 2 + (angleSize / 2);
       
-      // Get the value to determine how far out to place the label
+      // Calculate the value and percentage
       const value = dataset.data[index];
-      const maxValue = Math.max(...dataset.data);
+      const percent = (value / total * 100).toFixed(1);
       
-      // Calculate radius based on the data value plus a small offset (5-15%)
-      const valueRadius = (value / 100) * scales.r.end;
-      const labelRadius = valueRadius + (scales.r.end * 0.08); // Position slightly outside the sector
+      // Calculate positions for the path
+      const outerRadius = scales.r.end;
       
-      // Calculate the x and y position for the label
-      const x = centerX + Math.cos(angle) * labelRadius;
-      const y = centerY + Math.sin(angle) * labelRadius;
+      // Start point of line (at the outer edge of the sector)
+      const sx = centerX + (outerRadius) * Math.cos(midAngle);
+      const sy = centerY + (outerRadius) * Math.sin(midAngle);
       
-      // Styling for the labels - adjust based on text length
-      const fontSize = label.length > 10 ? '11px' : '13px';
-      ctx.font = `bold ${fontSize} Arial`;
-      ctx.fillStyle = 'white';
+      // Mid point of line (first bend)
+      const mx = centerX + (outerRadius + 30) * Math.cos(midAngle);
+      const my = centerY + (outerRadius + 30) * Math.sin(midAngle);
       
-      // Adjust text alignment based on position around the circle
-      // This makes text more naturally positioned relative to the sectors
-      if (x < centerX - 5) {
-        ctx.textAlign = 'right';
-      } else if (x > centerX + 5) {
-        ctx.textAlign = 'left';
-      } else {
-        ctx.textAlign = 'center';
-      }
+      // End point of line (where the text will be placed)
+      // Align all labels on the left or right side based on position
+      const ex = mx + (Math.cos(midAngle) >= 0 ? 1 : -1) * 22;
+      const ey = my;
       
-      if (y < centerY) {
-        ctx.textBaseline = 'bottom';
-      } else {
-        ctx.textBaseline = 'top';
-      }
+      // Text anchor based on which side of the chart
+      const textAnchor = Math.cos(midAngle) >= 0 ? 'start' : 'end';
       
-      // Draw background for better readability
-      const textWidth = ctx.measureText(label).width;
-      const padding = 4;
-      const bgHeight = parseInt(fontSize) + (padding * 2);
+      // Get the color for this data point
+      const color = COLORS[index % COLORS.length];
       
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
-      ctx.fillRect(
-        x - (textWidth / 2) - padding, 
-        y - (bgHeight / 2), 
-        textWidth + (padding * 2), 
-        bgHeight
-      );
+      // Draw the connecting path
+      ctx.beginPath();
+      ctx.moveTo(sx, sy);
+      ctx.lineTo(mx, my);
+      ctx.lineTo(ex, ey);
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
       
-      // Draw shadow to improve readability
-      ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
-      ctx.shadowBlur = 3;
-      ctx.shadowOffsetX = 1;
-      ctx.shadowOffsetY = 1;
+      // Draw a circle at the end point
+      ctx.beginPath();
+      ctx.arc(ex, ey, 2, 0, Math.PI * 2);
+      ctx.fillStyle = color;
+      ctx.fill();
       
-      // Draw the skill name label
-      ctx.fillStyle = 'white';
-      ctx.fillText(label, x, y);
+      // Set text styles
+      ctx.font = 'bold 14px Arial';
+      ctx.fillStyle = '#f1f5f9';
+      ctx.textAlign = textAnchor;
       
-      // Reset shadow effect after drawing
-      ctx.shadowColor = 'transparent';
-      ctx.shadowBlur = 0;
+      // Draw skill name and value
+      ctx.fillText(label, ex + (Math.cos(midAngle) >= 0 ? 8 : -8), ey);
+      
+      // Draw the value below the skill name
+      ctx.font = '12px Arial';
+      ctx.fillStyle = '#cbd5e1';
+      ctx.fillText(`${value}/100 (${percent}%)`, ex + (Math.cos(midAngle) >= 0 ? 8 : -8), ey + 20);
     });
     
     // Restore the original state
@@ -108,7 +118,7 @@ const centerLabelsPlugin = {
 };
 
 // Register the custom plugin
-ChartJS.register(centerLabelsPlugin);
+ChartJS.register(extendedPathLabelsPlugin);
 
 // Helper function to prepare chart data and options
 const prepareChartData = (skills) => {
@@ -118,24 +128,8 @@ const prepareChartData = (skills) => {
       {
         label: 'Skill Level',
         data: skills.map(item => parseInt(item.value, 10)),
-        backgroundColor: [
-          'rgba(255, 99, 132, 0.5)',
-          'rgba(54, 162, 235, 0.5)',
-          'rgba(255, 206, 86, 0.5)',
-          'rgba(75, 192, 192, 0.5)',
-          'rgba(153, 102, 255, 0.5)',
-          'rgba(255, 159, 64, 0.5)',
-          'rgba(199, 199, 199, 0.5)',
-        ],
-        borderColor: [
-          'rgba(255, 99, 132, 1)',
-          'rgba(54, 162, 235, 1)',
-          'rgba(255, 206, 86, 1)',
-          'rgba(75, 192, 192, 1)',
-          'rgba(153, 102, 255, 1)',
-          'rgba(255, 159, 64, 1)',
-          'rgba(199, 199, 199, 1)',
-        ],
+        backgroundColor: COLORS.map(color => `${color}dd`), // Less transparency
+        borderColor: COLORS,
         borderWidth: 1,
       }
     ]
@@ -145,13 +139,7 @@ const prepareChartData = (skills) => {
 const chartOptions = {
   plugins: {
     legend: {
-      position: 'right',
-      labels: {
-        color: '#f1f5f9',
-        font: {
-          size: 14
-        }
-      }
+      display: false, // Hide the legend since we're using our custom labels
     },
     tooltip: {
       callbacks: {
@@ -166,17 +154,14 @@ const chartOptions = {
       min: 0,
       max: 100,
       ticks: {
-        color: '#f1f5f9',
+        display: false, // Hide the radial ticks
         backdropColor: 'transparent'
       },
       grid: {
         color: 'rgba(255, 255, 255, 0.1)'
       },
       pointLabels: {
-        color: '#f1f5f9',
-        font: {
-          size: 14
-        }
+        display: false, // Hide the default point labels
       }
     }
   },
@@ -225,7 +210,6 @@ const SkillsPanel = kind({
           </Heading>
           <Button 
             size="small" 
-            icon="arrowleft" 
             onClick={onBack}
             style={{marginLeft: 'auto'}}
           >
