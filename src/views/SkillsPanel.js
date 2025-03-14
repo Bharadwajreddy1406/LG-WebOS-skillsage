@@ -201,11 +201,11 @@ const SkillsPanel = kind({
       <Panel {...rest}>
 
           <div style={{display: 'flex', alignItems: 'center'}}>
-            <Heading showLine style={{margin: 0, color: '#f1f5f9'}}>
+            <Heading showLine style={{margin: 0, color: '#f1f5f9', fontFamily: 'Helvetica, sans-serif'}}>
               Student Skills Assessment
             </Heading>
             {rollNumber && (
-              <BodyText style={{margin: '0 0 0 20px', color: '#f1f5f9'}}>
+              <BodyText style={{margin: '0 0 0 20px', color: '#f1f5f9', fontFamily: 'Helvetica, sans-serif'}}>
                 Roll Number: {rollNumber}
               </BodyText>
             )}
@@ -224,7 +224,8 @@ const SkillsPanel = kind({
             flexDirection: 'column',
             alignItems: 'center',
             padding: '2rem',
-            height: 'calc(100vh - 120px)'
+            height: 'calc(100vh - 120px)',
+            fontFamily: 'Helvetica, sans-serif'
           }}>
             <BodyText style={{
               marginBottom: '20px', 

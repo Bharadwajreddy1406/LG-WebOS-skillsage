@@ -21,7 +21,8 @@ const ProjectCard = ({repoName, description, languages, repoUrl}) => {
 		flexDirection: 'column',
 		height: '100%',
 		color: '#f1f5f9', // slate-100 text color
-		transition: 'transform 0.3s ease, box-shadow 0.3s ease'
+		transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+		fontFamily: 'Helvetica, sans-serif'
 	};
 
 	const hoverStyle = hover
@@ -73,7 +74,7 @@ const ProjectsPanel = kind({
 								marginRight: '20px'
 							}}
 						/>
-						<div>
+							<div style={{fontFamily: 'Helvetica, sans-serif'}}>
 							<Heading showLine style={{margin: 0, color: '#f1f5f9'}}>
 								Student Projects
 							</Heading>
@@ -101,7 +102,8 @@ const ProjectsPanel = kind({
 								display: 'grid',
 								gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
 								gap: '1rem',
-								padding: '1rem'
+								padding: '1rem',
+								fontFamily: 'Helvetica, sans-serif'
 							}}
 						>
 							{studentData.map((project, index) => (
@@ -122,7 +124,8 @@ const ProjectsPanel = kind({
 							display: 'flex',
 							justifyContent: 'center',
 							alignItems: 'center',
-							height: 'calc(100vh - 120px)'
+							height: 'calc(100vh - 120px)',
+							fontFamily: 'Helvetica, sans-serif'
 						}}>
 							<BodyText style={{color: '#f1f5f9', fontSize: '20px'}}>
 								No projects found for this student.

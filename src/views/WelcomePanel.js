@@ -28,7 +28,7 @@ const WelcomePanel = kind({
 								marginRight: '20px'
 							}}
 						/>
-						<div>
+							<div style={{fontFamily: 'Arial, sans-serif'}}>
 							<Heading showLine style={{margin: 0, color: '#f1f5f9'}}>
 								Skill Sage
 							</Heading>
@@ -60,7 +60,8 @@ const WelcomePanel = kind({
 						alignItems: 'center',
 						justifyContent: 'center',
 						height: 'calc(100vh - 120px)',
-						padding: '20px'
+						padding: '20px',
+						fontFamily: 'Arial, sans-serif'
 					}}>
 						{/* Error Display */}
 						{error && (
