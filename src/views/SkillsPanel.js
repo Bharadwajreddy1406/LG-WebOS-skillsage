@@ -1,10 +1,11 @@
-import React from 'react';
+import React, {useState} from 'react';
 import kind from '@enact/core/kind';
 import {Panel, Header} from '@enact/sandstone/Panels';
 import Scroller from '@enact/sandstone/Scroller';
 import Heading from '@enact/sandstone/Heading';
 import BodyText from '@enact/sandstone/BodyText';
 import Button from '@enact/sandstone/Button';
+import Image from '@enact/sandstone/Image';
 import {PolarArea} from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -31,6 +32,53 @@ const COLORS = [
   '#7158A1', // Deep Lavender  
   '#9A4785', // Muted Plum  
 ];
+
+// Hardcoded student profile data
+const studentProfileData = {
+  studentProfile: {
+    avatar: "https://cdn.jsdelivr.net/gh/alohe/memojis/png/notion_10.png",
+    name: "Sarah Johnson",
+    rollNumber: "21BCE1045",
+    cgpa: 9.2
+  }
+};
+
+// Student Profile Component
+const StudentProfile = ({isCollapsed, toggleCollapse, rollNumber}) => {
+  const { studentProfile } = studentProfileData;
+  
+  return (
+    <div style={{
+      background: '#161b22',
+      borderRadius: '8px',
+      boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+      padding: '16px',
+      color: '#f1f5f9',
+      height: isCollapsed ? '60px' : 'auto',
+      overflow: 'hidden',
+      transition: 'height 0.3s ease',
+      position: 'relative',
+      marginBottom: '16px'
+    }}>
+      <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: isCollapsed ? '0' : '16px'}}>
+        <Heading size="small" style={{margin: 0}}>Student Profile</Heading>
+        <Button size="small" icon={isCollapsed ? 'arrowdown' : 'arrowup'} onClick={toggleCollapse} />
+      </div>
+      
+      {!isCollapsed && (
+        <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: '8px'}}>
+          <Image 
+            src={studentProfile.avatar} 
+            style={{width: '100px', height: '100px', borderRadius: '50%', marginBottom: '16px'}}
+          />
+          <Heading size="small" style={{margin: '0 0 8px 0'}}>{studentProfile.name}</Heading>
+          <BodyText style={{margin: '0 0 4px 0'}}>Roll Number: {rollNumber || studentProfile.rollNumber}</BodyText>
+          <BodyText style={{margin: '0 0 16px 0'}}>CGPA: {studentProfile.cgpa}</BodyText>
+        </div>
+      )}
+    </div>
+  );
+};
 
 // Create a custom plugin for extending path labels
 const extendedPathLabelsPlugin = {
@@ -169,10 +217,11 @@ const chartOptions = {
   maintainAspectRatio: false
 };
 
-const SkillsPanel = kind({
+// The kind component without state management in the render method
+const SkillsPanelBase = kind({
   name: 'SkillsPanel',
 
-  render: ({skillsData, rollNumber, onBack, ...rest}) => {
+  render: ({skillsData, rollNumber, onBack, isProfileCollapsed, toggleProfileCollapse, ...rest}) => {
     // Default data if none provided
     const defaultSkillsData = {
       evaluationMetrics: [
@@ -199,59 +248,86 @@ const SkillsPanel = kind({
 
     return (
       <Panel {...rest}>
-
-          <div style={{display: 'flex', alignItems: 'center'}}>
-            <Heading showLine style={{margin: 0, color: '#f1f5f9', fontFamily: 'Helvetica, sans-serif'}}>
-              Student Skills Assessment
-            </Heading>
-            {rollNumber && (
-              <BodyText style={{margin: '0 0 0 20px', color: '#f1f5f9', fontFamily: 'Helvetica, sans-serif'}}>
-                Roll Number: {rollNumber}
-              </BodyText>
-            )}
-          </div>
+        <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 20px'}}>
+          <Heading showLine style={{margin: 0, color: '#f1f5f9', fontFamily: 'Helvetica, sans-serif'}}>
+            Student Skills Assessment
+          </Heading>
+          <BodyText style={{margin: '0 20px', color: '#f1f5f9', fontFamily: 'Helvetica, sans-serif'}}>
+            Roll Number: {rollNumber || 'Not available'}
+          </BodyText>
           <Button 
             size="small" 
             onClick={onBack}
-            style={{marginLeft: 'auto'}}
           >
             Back to Projects
           </Button>
+        </div>
 
-        <Scroller>
-          <div style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            padding: '2rem',
-            height: 'calc(100vh - 120px)',
-            fontFamily: 'Helvetica, sans-serif'
-          }}>
-            <BodyText style={{
-              marginBottom: '20px', 
-              color: '#f1f5f9',
-              fontSize: '16px',
-              textAlign: 'center'
-            }}>
-              Skills assessment based on project contributions and code analysis
-            </BodyText>
-            
-            <div style={{
-              width: '100%',
-              height: '70vh',
-              maxWidth: '800px',
-              margin: '0 auto',
-              padding: '20px',
-              background: 'rgba(22, 27, 34, 0.8)', 
-              borderRadius: '8px'
-            }}>
-              <PolarArea data={chartData} options={chartOptions} />
-            </div>
+        <div style={{display: 'flex', height: 'calc(100vh - 120px)'}}>
+          {/* Main content area (70%) */}
+          <div style={{width: '70%', padding: '0 16px 0 0'}}>
+            <Scroller>
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                padding: '2rem',
+                height: '100%',
+                fontFamily: 'Helvetica, sans-serif'
+              }}>
+                <BodyText style={{
+                  marginBottom: '20px', 
+                  color: '#f1f5f9',
+                  fontSize: '16px',
+                  textAlign: 'center'
+                }}>
+                  Skills assessment based on project contributions and code analysis
+                </BodyText>
+                
+                <div style={{
+                  width: '100%',
+                  height: '60vh',
+                  maxWidth: '700px',
+                  margin: '0 auto',
+                  padding: '20px',
+                  background: 'rgba(22, 27, 34, 0.8)', 
+                  borderRadius: '8px'
+                }}>
+                  <PolarArea data={chartData} options={chartOptions} />
+                </div>
+              </div>
+            </Scroller>
           </div>
-        </Scroller>
+          
+          {/* Student profile area (30%) */}
+          <div style={{width: '30%', padding: '16px'}}>
+            <StudentProfile 
+              isCollapsed={isProfileCollapsed} 
+              toggleCollapse={toggleProfileCollapse}
+              rollNumber={rollNumber}
+            />
+          </div>
+        </div>
       </Panel>
     );
   }
 });
+
+// Wrapper component to handle state
+const SkillsPanel = (props) => {
+  const [isProfileCollapsed, setIsProfileCollapsed] = useState(false);
+  
+  const toggleProfileCollapse = () => {
+    setIsProfileCollapsed(!isProfileCollapsed);
+  };
+  
+  return (
+    <SkillsPanelBase
+      {...props}
+      isProfileCollapsed={isProfileCollapsed}
+      toggleProfileCollapse={toggleProfileCollapse}
+    />
+  );
+};
 
 export default SkillsPanel;
