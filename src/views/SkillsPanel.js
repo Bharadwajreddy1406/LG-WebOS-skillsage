@@ -172,7 +172,7 @@ const chartOptions = {
 const SkillsPanel = kind({
   name: 'SkillsPanel',
 
-  render: ({skillsData, onBack, ...rest}) => {
+  render: ({skillsData, rollNumber, onBack, ...rest}) => {
     // Default data if none provided
     const defaultSkillsData = {
       evaluationMetrics: [
@@ -205,9 +205,16 @@ const SkillsPanel = kind({
             padding: '0 30px'
           }}
         >
-          <Heading showLine style={{margin: 0, color: '#f1f5f9'}}>
-            Student Skills Assessment
-          </Heading>
+          <div style={{display: 'flex', alignItems: 'center'}}>
+            <Heading showLine style={{margin: 0, color: '#f1f5f9'}}>
+              Student Skills Assessment
+            </Heading>
+            {rollNumber && (
+              <BodyText style={{margin: '0 0 0 20px', color: '#f1f5f9'}}>
+                Roll Number: {rollNumber}
+              </BodyText>
+            )}
+          </div>
           <Button 
             size="small" 
             onClick={onBack}

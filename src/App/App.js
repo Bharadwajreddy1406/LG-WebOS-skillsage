@@ -1,7 +1,9 @@
 import kind from '@enact/core/kind';
 import ThemeDecorator from '@enact/sandstone/ThemeDecorator';
 import Panels from '@enact/sandstone/Panels';
-import MainPanel from '../views/MainPanel';
+import WelcomePanel from '../views/WelcomePanel';
+import ProjectsPanel from '../views/ProjectsPanel';
+import SkillsPanel from '../views/SkillsPanel';
 import css from './App.module.less';
 import { useEffect, useState } from 'react';
 import mqtt from 'mqtt';
@@ -12,6 +14,7 @@ const App = (props) => {
   const [rollNum, setRollNum] = useState(null);
   const [studentData, setStudentData] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
+  const [currentPanel, setCurrentPanel] = useState('welcome');
   
   // Function to fetch student data
   const fetchStudentData = async (roll) => {
@@ -27,6 +30,9 @@ const App = (props) => {
       console.log('Fetched student data:', data);
       setStudentData(data);
       setErrorMsg(null);
+      
+      // Once data is fetched, move to projects panel
+      setCurrentPanel('projects');
     } catch (err) {
       console.error('Error fetching student data:', err);
       setErrorMsg('Failed to fetch student data');
@@ -39,7 +45,7 @@ const App = (props) => {
     const brokerUrl = 'wss://broker.emqx.io:8084/mqtt';
     const options = {
       clientId: 'webos_client_' + Math.random().toString(16).substring(2, 8),
-      keepalive: 60,
+      keepalive: 120,
       clean: true,
       reconnectPeriod: 1000, // Auto reconnect every 1 second
       connectTimeout: 30 * 1000, // 30 seconds
@@ -116,15 +122,53 @@ const App = (props) => {
       }
     };
   }, []);
+
+  // Panel navigation handlers
+  const showSkillsPanel = () => {
+    setCurrentPanel('skills');
+  };
+
+  const showProjectsPanel = () => {
+    setCurrentPanel('projects');
+  };
+  
+  // Skills data 
+  const skillsData = {
+    evaluationMetrics: [
+      {
+        skills: [
+          { skill: "JavaScript", value: "85" },
+          { skill: "React", value: "78" },
+          { skill: "TypeScript", value: "65" },
+          { skill: "HTML/CSS", value: "92" },
+          { skill: "API Design", value: "70" },
+          { skill: "State Management", value: "75" },
+          { skill: "Testing", value: "60" }
+        ]
+      }
+    ]
+  };
   
   return (
     <div {...props}>
-      <Panels>
-        <MainPanel 
+      <Panels noCloseButton index={
+        currentPanel === 'welcome' ? 0 : 
+        currentPanel === 'projects' ? 1 : 2
+      }>
+        <WelcomePanel 
           connected={connected}
           rollNumber={rollNum}
-          studentData={studentData}
           error={errorMsg}
+        />
+        <ProjectsPanel 
+          rollNumber={rollNum}
+          studentData={studentData}
+          onShowSkills={showSkillsPanel}
+        />
+        <SkillsPanel 
+          skillsData={skillsData}
+          rollNumber={rollNum}
+          onBack={showProjectsPanel}
         />
       </Panels>
     </div>
