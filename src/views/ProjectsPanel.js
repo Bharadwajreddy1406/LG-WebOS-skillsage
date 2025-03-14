@@ -63,13 +63,7 @@ const ProjectsPanel = kind({
 	render: ({rollNumber, studentData, onShowSkills, ...rest}) => {
 		return (
 			<Panel {...rest}>
-				<Header
-					style={{
-						background: 'linear-gradient(to right, #1F1F1F, #000000)',
-						padding: '0 30px'
-					}}
-				>
-					{/* Left side: Icon, Title & Roll Number */}
+
 					<div style={{display: 'flex', alignItems: 'center'}}>
 						<img
 							src={skillSageIcon}
@@ -98,7 +92,6 @@ const ProjectsPanel = kind({
 					>
 						Next: View Skills
 					</Button>
-				</Header>
 
 				<Scroller>
 					{/* Render each project as a custom card */}

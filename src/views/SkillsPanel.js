@@ -199,12 +199,7 @@ const SkillsPanel = kind({
 
     return (
       <Panel {...rest}>
-        <Header
-          style={{
-            background: 'linear-gradient(to right, #1F1F1F, #000000)',
-            padding: '0 30px'
-          }}
-        >
+
           <div style={{display: 'flex', alignItems: 'center'}}>
             <Heading showLine style={{margin: 0, color: '#f1f5f9'}}>
               Student Skills Assessment
@@ -222,7 +217,6 @@ const SkillsPanel = kind({
           >
             Back to Projects
           </Button>
-        </Header>
 
         <Scroller>
           <div style={{
