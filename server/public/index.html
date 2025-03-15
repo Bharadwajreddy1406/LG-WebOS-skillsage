@@ -3,140 +3,272 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel</title>
+    <title>SkillSage Admin Panel</title>
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* Typography and Base Styles */
         body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            letter-spacing: 0.01em;
         }
-        .container {
-            background-color: #f5f5f5;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        
+        h1, h2, h3, h4 {
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            font-weight: 700;
+            line-height: 1.2;
         }
-        .form-group {
-            margin-bottom: 15px;
+        
+        /* Enhanced UI Elements */
+        .gradient-header {
+            background: linear-gradient(120deg, #3182ce, #2c5282);
         }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
+        
+        .card {
+            transition: all 0.3s ease;
+            border-radius: 0.75rem;
         }
-        input[type="text"], select {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+        
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
-        button {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 4px;
+        
+        /* Button Styles */
+        .btn {
+            transition: all 0.2s ease;
+            font-weight: 500;
+            letter-spacing: 0.025em;
+        }
+        
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+        
+        .btn:active {
+            transform: translateY(1px);
+        }
+        
+        /* Table Styles */
+        table {
+            border-spacing: 0;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        }
+        
+        thead {
+            background: linear-gradient(90deg, #f7fafc, #edf2f7);
+        }
+        
+        th {
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        tr {
+            border-bottom: 1px solid #f1f5f9;
+            transition: background-color 0.15s ease;
+        }
+        
+        tr:hover {
+            background-color: #f9fafb;
+        }
+        
+        /* Client Selection */
+        tr.selected {
+            background-color: rgba(59, 130, 246, 0.05) !important;
+            border-left: 4px solid #3b82f6;
+        }
+        
+        /* Client Name Editing */
+        .client-name span {
             cursor: pointer;
-            margin-right: 5px;
+            transition: all 0.15s ease;
+            border-bottom: 1px dashed transparent;
         }
-        button:hover {
-            background-color: #45a049;
+        
+        .client-name span:hover {
+            border-bottom: 1px dashed #d1d5db;
+            color: #2563eb;
         }
-        .status {
-            margin-top: 20px;
-            padding: 10px;
-            border-radius: 4px;
-            background-color: #e7f3fe;
-            border-left: 6px solid #2196F3;
+        
+        /* Status Badge Styles */
+        .status-badge {
+            font-size: 0.7rem;
+            letter-spacing: 0.05em;
+            font-weight: 600;
+            text-transform: uppercase;
         }
-        .connections {
-            margin-top: 20px;
+        
+        /* Form Control Focus States */
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+            border-color: #3b82f6;
         }
-        .client-list {
-            margin-top: 20px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            padding: 10px;
-            max-height: 300px;
-            overflow-y: auto;
+        
+        /* Custom Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
-        .client-item {
-            padding: 8px;
-            border-bottom: 1px solid #eee;
-            cursor: pointer;
+        
+        .animate-fadeIn {
+            animation: fadeIn 0.3s ease-in-out;
         }
-        .client-item:hover {
-            background-color: #f0f0f0;
-        }
-        .client-item.selected {
-            background-color: #e0f7fa;
-        }
-        .client-item-id {
-            font-weight: bold;
-            color: #0277bd;
-        }
-        .client-item-details {
-            font-size: 12px;
-            color: #666;
-        }
-        .refresh-btn {
-            background-color: #2196F3;
-        }
-        .refresh-btn:hover {
-            background-color: #0b7dda;
+        
+        /* Responsive Adjustments */
+        @media (max-width: 640px) {
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <h1>Admin Control Panel</h1>
+<body class="bg-gray-50 font-sans leading-normal tracking-normal text-gray-800">
+    <div class="max-w-6xl mx-auto p-4 sm:p-6 lg:p-8">
+        <!-- Modern Header with Gradient -->
+        <header class="gradient-header text-white shadow-lg rounded-xl p-6 mb-8 flex items-center justify-between">
+            <div class="flex items-center">
+                <div class="bg-white p-2 rounded-full shadow-md mr-4">
+                    <img src="/logo.png" alt="SkillSage Logo" class="h-12 w-12 rounded-full">
+                </div>
+                <div>
+                    <h1 class="text-3xl font-bold">SKILLSAGE.</h1>
+                    <p class="text-blue-100 mt-1">WebSocket Admin control panel</p>
+                </div>
+            </div>
+            <div class="text-blue-100 text-sm font-medium">
+                in partnership with <span class="font-bold">KMIT</span>
+            </div>
+        </header>
         
-        <div class="form-group">
-            <button id="refreshClients" class="refresh-btn">Refresh Client List</button>
-            <span id="clientCount">No clients connected</span>
+        <!-- Dashboard Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <!-- Client Count Card -->
+            <div class="card bg-white shadow-sm p-6 rounded-xl flex items-center space-x-4">
+                <div class="bg-blue-500 rounded-full p-3">
+                    <i class="fas fa-users text-white text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500 uppercase tracking-wider font-medium">Connected Clients</p>
+                    <p id="clientCount" class="text-3xl font-bold text-gray-900">0</p>
+                </div>
+            </div>
+            
+            <!-- Actions Card -->
+            <div class="card bg-white shadow-sm p-6 rounded-xl">
+                <p class="text-sm text-gray-500 uppercase tracking-wider font-medium mb-3">Quick Actions</p>
+                <div class="flex space-x-2">
+                    <button id="refreshClients" class="btn flex-1 bg-emerald-500 hover:bg-emerald-600 text-white py-2 px-4 rounded-lg transition-all">
+                        <i class="fas fa-sync-alt mr-2"></i> Refresh
+                    </button>
+                    <button onclick="testWebSocket()" class="btn flex-1 bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg transition-all">
+                        <i class="fas fa-power-off mr-2"></i> Restart
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Status Card -->
+            <div class="card bg-white shadow-sm p-6 rounded-xl">
+                <p class="text-sm text-gray-500 uppercase tracking-wider font-medium mb-2">Server Status</p>
+                <div id="wsStatus" class="text-sm">
+                    <span class="inline-block bg-green-100 text-green-800 rounded-full px-3 py-1">
+                        <i class="fas fa-circle text-green-500 text-xs mr-2"></i>Operational
+                    </span>
+                </div>
+                <div id="status" class="mt-2 text-sm text-gray-600">Ready to process commands</div>
+            </div>
         </div>
         
-        <div class="client-list" id="clientList">
-            <div class="client-item">No clients connected</div>
-        </div>
-        
-        <div class="form-group">
-            <label for="targetClient">Target Client:</label>
-            <select id="targetClient">
-                <option value="">All Clients (Broadcast)</option>
-            </select>
-        </div>
-        
-        <div class="form-group">
-            <label for="rollNumber">Roll Number:</label>
-            <input type="text" id="rollNumber" placeholder="Enter roll number">
-        </div>
-        
-        <button onclick="sendRoll()">Send Roll Number</button>
-        
-        <hr>
-        
-        <div class="form-group">
-            <label for="dataPayload">Data Payload:</label>
-            <input type="text" id="dataPayload" placeholder="Enter data payload">
-        </div>
-        
-        <button onclick="updateData()">Update Data</button>
-        
-        <div class="status" id="status">Status: Ready</div>
-        
-        <div class="connections">
-            <h3>WebSocket Test</h3>
-            <p>You can test WebSocket communication here:</p>
-            <button onclick="testWebSocket()">Test WebSocket Connection</button>
-            <div id="wsStatus"></div>
+        <!-- Main Content Area -->
+        <div class="flex flex-col lg:flex-row gap-6">
+            <!-- Left Column - Controls -->
+            <div class="w-full lg:w-1/3 space-y-6">
+                <!-- Target Selection Card -->
+                <div class="card bg-white shadow-sm p-6 rounded-xl">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4">Target Selection</h2>
+                    
+                    <div class="mb-4">
+                        <label for="targetClient" class="block text-sm font-medium text-gray-700 mb-1">Select Client:</label>
+                        <div class="relative">
+                            <select id="targetClient" class="form-select block w-full bg-white border border-gray-300 rounded-lg py-2 px-3 appearance-none focus:outline-none">
+                                <option value="">All Clients (Broadcast)</option>
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                <i class="fas fa-chevron-down text-xs"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Command Card -->
+                <div class="card bg-white shadow-sm p-6 rounded-xl">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4">Send Commands</h2>
+                    
+                    <!-- Roll Number Input -->
+                    <div class="mb-4">
+                        <label for="rollNumber" class="block text-sm font-medium text-gray-700 mb-1">Roll Number:</label>
+                        <div class="flex items-center space-x-2">
+                            <input type="text" id="rollNumber" placeholder="e.g. 21BCE1045" class="form-input flex-1 shadow-sm border border-gray-300 rounded-lg py-2 px-3 text-gray-700 leading-tight">
+                            <button onclick="sendRoll()" class="btn bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-lg">
+                                <i class="fas fa-paper-plane mr-1"></i> Send
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Data Payload -->
+                    <div>
+                        <label for="dataPayload" class="block text-sm font-medium text-gray-700 mb-1">Data Payload:</label>
+                        <div class="flex items-center space-x-2">
+                            <input type="text" id="dataPayload" placeholder="JSON or text data" class="form-input flex-1 shadow-sm border border-gray-300 rounded-lg py-2 px-3 text-gray-700 leading-tight">
+                            <button onclick="updateData()" class="btn bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-lg">
+                                <i class="fas fa-paper-plane mr-1"></i> Send
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Column - Client Table -->
+            <div class="w-full lg:w-2/3">
+                <div class="card bg-white shadow-sm p-6 rounded-xl">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-semibold text-gray-800">Connected Clients</h2>
+                        <span class="text-sm text-gray-500">Double-click names to edit</span>
+                    </div>
+                    
+                    <div class="overflow-x-auto rounded-lg">
+                        <table class="min-w-full rounded-lg overflow-hidden">
+                            <thead>
+                                <tr>
+                                    <th class="py-3 px-4 text-left">Client Name</th>
+                                    <th class="py-3 px-4 text-left">Connected At</th>
+                                    <th class="py-3 px-4 text-left">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="clientList" class="bg-white">
+                                <tr>
+                                    <td colspan="3" class="py-4 px-4 text-center text-gray-500 animate-fadeIn">
+                                        <i class="fas fa-plug text-gray-300 text-3xl mb-2"></i>
+                                        <p>No clients connected</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
         let clients = [];
         let selectedClientId = '';
+        let editingClientId = null;
         
         // Load clients when page loads
         document.addEventListener('DOMContentLoaded', fetchClients);
@@ -147,7 +279,7 @@
                 .then(response => response.json())
                 .then(data => {
                     clients = data.clients;
-                    document.getElementById('clientCount').innerText = `${data.count} clients connected`;
+                    document.getElementById('clientCount').innerText = data.count;
                     
                     // Update client list
                     const clientListEl = document.getElementById('clientList');
@@ -162,63 +294,166 @@
                     clientListEl.innerHTML = '';
                     
                     if (data.clients.length === 0) {
-                        clientListEl.innerHTML = '<div class="client-item">No clients connected</div>';
+                        clientListEl.innerHTML = `
+                            <tr>
+                                <td colspan="3" class="py-8 px-4 text-center text-gray-500 animate-fadeIn">
+                                    <i class="fas fa-plug text-gray-300 text-3xl mb-3"></i>
+                                    <p>No clients connected</p>
+                                </td>
+                            </tr>
+                        `;
                     } else {
-                        data.clients.forEach(client => {
-                            // Add to visual list
-                            const clientItem = document.createElement('div');
-                            clientItem.className = 'client-item';
-                            clientItem.dataset.id = client.id;
+                        data.clients.forEach((client, index) => {
+                            // Client name (stored or default)
+                            const clientName = client.name || `Client ${index + 1}`;
                             
-                            if (client.id === selectedClientId) {
-                                clientItem.className += ' selected';
-                            }
-                            
-                            const connectTime = new Date(client.connectTime);
-                            const lastActive = new Date(client.lastActive);
-                            
-                            clientItem.innerHTML = `
-                                <div class="client-item-id">${client.id}</div>
-                                <div class="client-item-details">
-                                    IP: ${client.ip}<br>
-                                    Connected: ${connectTime.toLocaleTimeString()}<br>
-                                    Last Active: ${lastActive.toLocaleTimeString()}
-                                </div>
-                            `;
-                            clientItem.onclick = () => selectClient(client.id);
-                            clientListEl.appendChild(clientItem);
-                            
-                            // Add to dropdown
+                            // Add to dropdown - use friendly name instead of hash
                             const option = document.createElement('option');
                             option.value = client.id;
-                            option.text = `Client: ${client.id.substring(0, 8)}...`;
+                            option.text = clientName;
                             targetClientEl.appendChild(option);
+                            
+                            // Add to table
+                            const tr = document.createElement('tr');
+                            tr.className = index % 2 === 0 ? 'bg-white' : 'bg-gray-50';
+                            if (client.id === selectedClientId) {
+                                tr.classList.add('selected');
+                            }
+                            tr.dataset.id = client.id;
+                            tr.onclick = () => selectClient(client.id);
+                            
+                            const connectTime = new Date(client.connectTime);
+                            const formattedTime = connectTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                            const formattedDate = connectTime.toLocaleDateString([], { 
+                                month: 'short', 
+                                day: 'numeric'
+                            });
+                            
+                            tr.innerHTML = `
+                                <td class="py-4 px-4 client-name">
+                                    <span ondblclick="startEditingClient('${client.id}', '${clientName}')" class="font-medium text-gray-800">${clientName}</span>
+                                </td>
+                                <td class="py-4 px-4 text-gray-600">
+                                    <div>${formattedTime}</div>
+                                    <div class="text-xs text-gray-500">${formattedDate}</div>
+                                </td>
+                                <td class="py-4 px-4">
+                                    <span class="status-badge px-2 py-1 rounded-full bg-green-100 text-green-800">
+                                        <i class="fas fa-circle text-green-500 text-xs mr-1"></i>Connected
+                                    </span>
+                                </td>
+                            `;
+                            
+                            clientListEl.appendChild(tr);
                         });
                     }
                 })
                 .catch(error => {
                     console.error('Error fetching clients:', error);
-                    document.getElementById('status').innerText = `Error: Failed to fetch clients`;
+                    document.getElementById('status').innerHTML = `<span class="text-red-600">Error: Failed to fetch clients</span>`;
                 });
+        }
+        
+        // Function to start editing client name
+        function startEditingClient(clientId, currentName) {
+            if (editingClientId === clientId) return;
+            
+            const cell = document.querySelector(`tr[data-id="${clientId}"] .client-name`);
+            editingClientId = clientId;
+            
+            cell.innerHTML = `
+                <div class="flex items-center space-x-2">
+                    <input type="text" class="form-input flex-1 border border-gray-300 rounded-lg py-1 px-2 text-sm" 
+                           value="${currentName}" id="edit-${clientId}">
+                    <button onclick="saveClientName('${clientId}')" class="text-green-600 hover:text-green-800">
+                        <i class="fas fa-check"></i>
+                    </button>
+                    <button onclick="cancelEditingClient('${clientId}', '${currentName}')" class="text-red-600 hover:text-red-800">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+            
+            document.getElementById(`edit-${clientId}`).focus();
+        }
+        
+        // Function to save client name
+        function saveClientName(clientId) {
+            const input = document.getElementById(`edit-${clientId}`);
+            const newName = input.value.trim() || `Client`;
+            
+            const cell = document.querySelector(`tr[data-id="${clientId}"] .client-name`);
+            cell.innerHTML = '<div class="flex items-center"><div class="spinner mr-2"></div><span class="text-gray-400">Saving...</span></div>';
+            
+            // Send to the server to save the name
+            fetch('/update-client-name/' + clientId, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name: newName })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to update name');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Update the display in the table
+                cell.innerHTML = `<span ondblclick="startEditingClient('${clientId}', '${newName}')" class="font-medium text-gray-800">${newName}</span>`;
+                
+                // Update client in array
+                const client = clients.find(c => c.id === clientId);
+                if (client) {
+                    client.name = newName;
+                }
+                
+                // Update in the dropdown
+                const option = document.querySelector(`#targetClient option[value="${clientId}"]`);
+                if (option) {
+                    option.text = newName;
+                }
+                
+                document.getElementById('status').innerHTML = `<span class="text-green-600">Client name updated to "${newName}"</span>`;
+                editingClientId = null;
+            })
+            .catch(error => {
+                console.error('Error updating client name:', error);
+                cell.innerHTML = `<span ondblclick="startEditingClient('${clientId}', '${newName}')" class="font-medium text-gray-800">${newName}</span>`;
+                document.getElementById('status').innerHTML = `<span class="text-red-600">Error: Failed to update client name</span>`;
+                editingClientId = null;
+            });
+        }
+        
+        // Function to cancel editing client name
+        function cancelEditingClient(clientId, originalName) {
+            const cell = document.querySelector(`tr[data-id="${clientId}"] .client-name`);
+            cell.innerHTML = `<span ondblclick="startEditingClient('${clientId}', '${originalName}')" class="font-medium text-gray-800">${originalName}</span>`;
+            editingClientId = null;
         }
         
         // Function to select client
         function selectClient(clientId) {
             selectedClientId = clientId;
             
-            // Update UI
-            document.querySelectorAll('.client-item').forEach(item => {
-                if (item.dataset.id === clientId) {
-                    item.classList.add('selected');
+            // Update UI to show selection
+            document.querySelectorAll('tr[data-id]').forEach(row => {
+                if (row.dataset.id === clientId) {
+                    row.classList.add('selected');
                 } else {
-                    item.classList.remove('selected');
+                    row.classList.remove('selected');
                 }
             });
             
             // Update dropdown
             document.getElementById('targetClient').value = clientId;
             
-            document.getElementById('status').innerText = `Selected client: ${clientId}`;
+            // Get client name for status message
+            const client = clients.find(c => c.id === clientId);
+            const clientName = client?.name || clientId.substring(0, 8);
+            
+            document.getElementById('status').innerHTML = `Selected client: <span class="font-medium">${clientName}</span>`;
         }
         
         // Refresh client list button
@@ -274,37 +509,40 @@
                 });
         }
         
-        // Test WebSocket connection
+        // Test WebSocket connection (repurposed as "restart server" for UI)
         function testWebSocket() {
             const wsStatus = document.getElementById('wsStatus');
-            wsStatus.innerHTML = "Connecting...";
+            wsStatus.innerHTML = `<span class="inline-block bg-yellow-100 text-yellow-800 rounded-full px-3 py-1">
+                <i class="fas fa-sync fa-spin text-yellow-500 text-xs mr-2"></i>Connecting...
+            </span>`;
             
             // Create WebSocket connection
             const socket = new WebSocket(`ws://${window.location.host}`);
             
             socket.onopen = function(e) {
-                wsStatus.innerHTML = "Connected to WebSocket server!";
+                wsStatus.innerHTML = `<span class="inline-block bg-green-100 text-green-800 rounded-full px-3 py-1">
+                    <i class="fas fa-circle text-green-500 text-xs mr-2"></i>Connected
+                </span>`;
+                
+                // Refresh client list
+                setTimeout(fetchClients, 500);
+                document.getElementById('status').innerHTML = `<span class="text-green-600">Server connection established</span>`;
             };
             
             socket.onmessage = function(event) {
-                const data = JSON.parse(event.data);
-                wsStatus.innerHTML += `<br>Received: ${JSON.stringify(data)}`;
-                
-                // If we received a clientId, let's use it to identify this connection
-                if (data.type === 'connection') {
-                    wsStatus.innerHTML += `<br>Assigned Client ID: ${data.clientId}`;
-                    
-                    // Refresh the client list to show this new connection
-                    setTimeout(fetchClients, 500);
-                }
+                // ...existing code...
             };
             
             socket.onclose = function(event) {
-                wsStatus.innerHTML += "<br>Connection closed";
+                wsStatus.innerHTML = `<span class="inline-block bg-red-100 text-red-800 rounded-full px-3 py-1">
+                    <i class="fas fa-exclamation-circle text-red-500 text-xs mr-2"></i>Disconnected
+                </span>`;
             };
             
             socket.onerror = function(error) {
-                wsStatus.innerHTML += `<br>Error: ${error.message}`;
+                wsStatus.innerHTML = `<span class="inline-block bg-red-100 text-red-800 rounded-full px-3 py-1">
+                    <i class="fas fa-exclamation-circle text-red-500 text-xs mr-2"></i>Error
+                </span>`;
             };
         }
         

@@ -39,7 +39,8 @@ wss.on('connection', (ws, req) => {
         ws,
         ip,
         connectTime: new Date(),
-        lastActive: new Date()
+        lastActive: new Date(),
+        name: null // Add name field for the UI feature
     });
     
     console.log(`Client connected: ${clientId} (${ip}), Total clients: ${clients.size}`);
@@ -118,12 +119,35 @@ app.get('/clients', (req, res) => {
         id,
         ip: client.ip,
         connectTime: client.connectTime,
-        lastActive: client.lastActive
+        lastActive: client.lastActive,
+        name: client.name // Include name in the response
     }));
     
     res.json({
         count: clients.size,
         clients: clientList
+    });
+});
+
+// New route: Update client name
+app.post('/update-client-name/:clientId', (req, res) => {
+    const { clientId } = req.params;
+    const { name } = req.body;
+    
+    if (!clientId) {
+        return res.status(400).json({ error: 'Client ID is required' });
+    }
+    
+    if (!clients.has(clientId)) {
+        return res.status(404).json({ error: 'Client not found' });
+    }
+    
+    // Update the client's name
+    clients.get(clientId).name = name;
+    
+    res.json({ 
+        success: true, 
+        message: `Client ${clientId} name updated to: ${name}` 
     });
 });
 
