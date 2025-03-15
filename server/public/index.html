@@ -304,13 +304,17 @@
                         `;
                     } else {
                         data.clients.forEach((client, index) => {
-                            // Client name (stored or default)
-                            const clientName = client.name || `Client ${index + 1}`;
+                            // Ensure client name is friendly and not a hash
+                            // Either use the saved name or create a friendly default
+                            const defaultName = `Client ${index + 1}`;
+                            const clientName = client.name || defaultName;
+                            // Escape quotes to prevent HTML attribute issues
+                            const escapedName = clientName.replace(/"/g, '&quot;');
                             
-                            // Add to dropdown - use friendly name instead of hash
+                            // Add to dropdown with friendly name
                             const option = document.createElement('option');
                             option.value = client.id;
-                            option.text = clientName;
+                            option.text = clientName;  // Use friendly name in dropdown
                             targetClientEl.appendChild(option);
                             
                             // Add to table
@@ -331,7 +335,11 @@
                             
                             tr.innerHTML = `
                                 <td class="py-4 px-4 client-name">
-                                    <span ondblclick="startEditingClient('${client.id}', '${clientName}')" class="font-medium text-gray-800">${clientName}</span>
+                                    <div class="flex items-center">
+                                        <span ondblclick="startEditingClient('${client.id}', '${escapedName}')" 
+                                              class="font-medium text-gray-800 hover:underline cursor-pointer">${clientName}</span>
+                                        <i class="fas fa-pencil-alt text-gray-400 ml-2 text-xs"></i>
+                                    </div>
                                 </td>
                                 <td class="py-4 px-4 text-gray-600">
                                     <div>${formattedTime}</div>
@@ -354,13 +362,14 @@
                 });
         }
         
-        // Function to start editing client name
+        // Function to start editing client name (improved)
         function startEditingClient(clientId, currentName) {
             if (editingClientId === clientId) return;
             
             const cell = document.querySelector(`tr[data-id="${clientId}"] .client-name`);
             editingClientId = clientId;
             
+            // Create editing interface
             cell.innerHTML = `
                 <div class="flex items-center space-x-2">
                     <input type="text" class="form-input flex-1 border border-gray-300 rounded-lg py-1 px-2 text-sm" 
@@ -374,16 +383,28 @@
                 </div>
             `;
             
-            document.getElementById(`edit-${clientId}`).focus();
+            const input = document.getElementById(`edit-${clientId}`);
+            input.focus();
+            input.select(); // Select all text for easy replacement
+            
+            // Add keyboard support for better UX
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    saveClientName(clientId);
+                } else if (e.key === 'Escape') {
+                    cancelEditingClient(clientId, currentName);
+                }
+            });
         }
         
-        // Function to save client name
+        // Function to save client name (improved)
         function saveClientName(clientId) {
             const input = document.getElementById(`edit-${clientId}`);
             const newName = input.value.trim() || `Client`;
             
             const cell = document.querySelector(`tr[data-id="${clientId}"] .client-name`);
-            cell.innerHTML = '<div class="flex items-center"><div class="spinner mr-2"></div><span class="text-gray-400">Saving...</span></div>';
+            // Show saving indicator
+            cell.innerHTML = '<div class="flex items-center"><span class="text-gray-400">Saving...</span></div>';
             
             // Send to the server to save the name
             fetch('/update-client-name/' + clientId, {
@@ -400,8 +421,17 @@
                 return response.json();
             })
             .then(data => {
-                // Update the display in the table
-                cell.innerHTML = `<span ondblclick="startEditingClient('${clientId}', '${newName}')" class="font-medium text-gray-800">${newName}</span>`;
+                // Escape quotes for safety
+                const escapedName = newName.replace(/"/g, '&quot;');
+                
+                // Update the display in the table with pencil icon
+                cell.innerHTML = `
+                    <div class="flex items-center">
+                        <span ondblclick="startEditingClient('${clientId}', '${escapedName}')" 
+                              class="font-medium text-gray-800 hover:underline cursor-pointer">${newName}</span>
+                        <i class="fas fa-pencil-alt text-gray-400 ml-2 text-xs"></i>
+                    </div>
+                `;
                 
                 // Update client in array
                 const client = clients.find(c => c.id === clientId);
@@ -420,16 +450,30 @@
             })
             .catch(error => {
                 console.error('Error updating client name:', error);
-                cell.innerHTML = `<span ondblclick="startEditingClient('${clientId}', '${newName}')" class="font-medium text-gray-800">${newName}</span>`;
+                const escapedName = newName.replace(/"/g, '&quot;');
+                cell.innerHTML = `
+                    <div class="flex items-center">
+                        <span ondblclick="startEditingClient('${clientId}', '${escapedName}')" 
+                              class="font-medium text-gray-800 hover:underline cursor-pointer">${newName}</span>
+                        <i class="fas fa-pencil-alt text-gray-400 ml-2 text-xs"></i>
+                    </div>
+                `;
                 document.getElementById('status').innerHTML = `<span class="text-red-600">Error: Failed to update client name</span>`;
                 editingClientId = null;
             });
         }
         
-        // Function to cancel editing client name
+        // Function to cancel editing client name (improved)
         function cancelEditingClient(clientId, originalName) {
             const cell = document.querySelector(`tr[data-id="${clientId}"] .client-name`);
-            cell.innerHTML = `<span ondblclick="startEditingClient('${clientId}', '${originalName}')" class="font-medium text-gray-800">${originalName}</span>`;
+            const escapedName = originalName.replace(/"/g, '&quot;');
+            cell.innerHTML = `
+                <div class="flex items-center">
+                    <span ondblclick="startEditingClient('${clientId}', '${escapedName}')" 
+                          class="font-medium text-gray-800 hover:underline cursor-pointer">${originalName}</span>
+                    <i class="fas fa-pencil-alt text-gray-400 ml-2 text-xs"></i>
+                </div>
+            `;
             editingClientId = null;
         }
         

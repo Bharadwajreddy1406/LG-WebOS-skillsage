@@ -142,12 +142,16 @@ app.post('/update-client-name/:clientId', (req, res) => {
         return res.status(404).json({ error: 'Client not found' });
     }
     
+    // Ensure there's always a valid name (never null or undefined)
+    const clientName = (name && name.trim()) ? name.trim() : `Client`;
+    
     // Update the client's name
-    clients.get(clientId).name = name;
+    clients.get(clientId).name = clientName;
+    console.log(`Client ${clientId} name updated to: ${clientName}`);
     
     res.json({ 
         success: true, 
-        message: `Client ${clientId} name updated to: ${name}` 
+        message: `Client ${clientId} name updated to: ${clientName}` 
     });
 });
 
