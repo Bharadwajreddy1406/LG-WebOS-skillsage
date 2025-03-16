@@ -11,7 +11,7 @@ function App() {
 
   useEffect(() => {
     console.log("Attempting to connect to WebSocket server...")
-    const ws = new WebSocket("ws://localhost:4000")
+    const ws = new WebSocket("ws://192.168.1.14:4000")
 
     ws.onopen = () => {
       console.log("✅ WebSocket connection established")

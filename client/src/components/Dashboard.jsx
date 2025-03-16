@@ -58,7 +58,7 @@ function StudentDashboard({ rollNumber }) {
       }
 
       try {
-        ws = new WebSocket("ws://localhost:4000")
+        ws = new WebSocket("ws://192.168.1.14:4000")
         ws.onopen = () => {
           console.log("✅ Dashboard WebSocket connected")
           setIsConnected(true)
@@ -96,7 +96,7 @@ function StudentDashboard({ rollNumber }) {
     const fetchData = async () => {
       setIsLoading(true)
       try {
-        const response = await axios.get('http://localhost:4000/api/all-data')
+        const response = await axios.get('http://192.168.1.14:4000/api/all-data')
         console.log('Received data:', response.data)
         console.log('GitHub Projects:', response.data.githubProjects)
 
