@@ -3,41 +3,58 @@
 import { useState, useEffect } from "react"
 import "./App.css"
 import logo from "./assets/-512x512.png"
+import StudentDashboard from "./components/Dashboard"
 
 function App() {
-  // State to track connection status
   const [isConnected, setIsConnected] = useState(false)
+  const [rollNumber, setRollNumber] = useState(null)
 
-  // Connect to WebSocket server when component mounts
   useEffect(() => {
-    // Create WebSocket connection
+    console.log("Attempting to connect to WebSocket server...")
     const ws = new WebSocket("ws://localhost:4000")
 
-    // Event handler for connection open
     ws.onopen = () => {
-      console.log("Connected to WebSocket server")
+      console.log("✅ WebSocket connection established")
       setIsConnected(true)
     }
 
-    // Event handler for errors
+    ws.onmessage = (event) => {
+      console.log("📩 Received WebSocket message:", event.data)
+      try {
+        const data = JSON.parse(event.data)
+        console.log("📋 Parsed message data:", data)
+        
+        // Check for rollUpdate message type
+        if (data.type === "rollUpdate" && data.roll) {
+          console.log("🎯 Roll number received:", data.roll)
+          setRollNumber(data.roll)
+        }
+      } catch (error) {
+        console.error("❌ Error parsing WebSocket message:", error)
+      }
+    }
+
     ws.onerror = (error) => {
       console.error("WebSocket error:", error)
       setIsConnected(false)
     }
 
-    // Event handler for connection close
     ws.onclose = () => {
       console.log("Disconnected from WebSocket server")
       setIsConnected(false)
     }
 
-    // Clean up function to close WebSocket when component unmounts
     return () => {
+      console.log("Cleaning up WebSocket connection...")
       if (ws) {
         ws.close()
       }
     }
-  }, []) // Empty dependency array ensures this runs only on mount
+  }, [])
+
+  if (rollNumber) {
+    return <StudentDashboard rollNumber={rollNumber} />
+  }
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-b from-[#0c1929] to-slate-800 flex items-center justify-center p-4">
