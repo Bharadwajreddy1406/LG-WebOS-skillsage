@@ -1,0 +1,29 @@
+{
+	"id": "com.skillsage.app",
+	"version": "1.0.0",
+	"vendor": "SkillSage",
+	"type": "web",
+	"main": "index.html",
+	"title": "Skill Sage",
+	"subtitle": "Student Mock Inteview and Upskilling Platform",
+	"icon": "src/icons/96x96.png",
+	"largeIcon": "src/icons/192x192.png",
+	"splashBackground": "splash-background.png",
+	"bgColor": "#000000",
+	"bgImage": "",
+	"iconColor": "#ffffff",
+	"disableBackHistoryAPI": true,
+	"handlesRelaunch": true,
+	"requiredPermissions": [
+		"time.query",
+		"background.collect",
+		"activity.operation"
+	],
+	"resolution": "1920x1080",
+	"supportResolutions": [
+		"1280x720",
+		"1920x1080",
+		"3840x2160"
+	],
+	"internetAccess": true
+}
