@@ -34,9 +34,9 @@ const COLORS = [
 function StudentDashboard({ rollNumber }) {
   const [isConnected, setIsConnected] = useState(false)
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
-  const [data, setData] = useState({ 
-    skills: [], 
-    githubProjects: [] 
+  const [data, setData] = useState({
+    skills: [],
+    githubProjects: []
   })
   const [isLoading, setIsLoading] = useState(true)
 
@@ -76,6 +76,7 @@ function StudentDashboard({ rollNumber }) {
       setIsLoading(true)
       try {
         const response = await axios.get('http://localhost:4000/api/all-data')
+        const response = await axios.get('http://localhost:4000/api/all-data')
         console.log('Received data:', response.data)
         console.log('GitHub Projects:', response.data.githubProjects)
 
@@ -92,7 +93,7 @@ function StudentDashboard({ rollNumber }) {
         setIsLoading(false)
       }
     }
-    
+
     fetchData()
   }, [])
 
@@ -110,13 +111,13 @@ function StudentDashboard({ rollNumber }) {
   }
 
   // Updated polarAreaOptions
-const polarAreaOptions = {
+  const polarAreaOptions = {
     responsive: true,
     maintainAspectRatio: false,
     // Remove or disable data labels so there's no text in the center
     plugins: {
       datalabels: {
-        display: false, 
+        display: false,
       },
       legend: {
         position: "bottom",
@@ -160,7 +161,7 @@ const polarAreaOptions = {
       },
     },
   };
-  
+
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen)
   }
@@ -179,8 +180,8 @@ const polarAreaOptions = {
         </div>
         {/* Connection status */}
         {isConnected ? (
-          <div className="bg-green-200 text-green-700 px-4 py-1 rounded-full flex items-center">
-            <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+          <div style={{ backgroundColor: '#e8f5e9', color: '#388e3c', padding: '0.25rem 1rem', borderRadius: '9999px', display: 'flex', alignItems: 'center' }}>
+            <div style={{ width: '0.5rem', height: '0.5rem', backgroundColor: '#4caf50', borderRadius: '9999px', marginRight: '0.5rem' }}></div>
             connected
           </div>
         ) : (
@@ -195,13 +196,12 @@ const polarAreaOptions = {
       <div className="flex flex-1 w-full h-[calc(100vh-5rem)] overflow-hidden">
         {/* Sidebar */}
         <aside
-          className={`bg-[#1e2a3a] h-full transition-all duration-300 ease-in-out flex flex-col ${
-            isSidebarOpen ? "w-64" : "w-20"
-          } min-h-0 relative`}
+          className={`bg-[#1e2a3a] h-full transition-all duration-300 ease-in-out flex flex-col ${isSidebarOpen ? "w-64" : "w-20"
+            } min-h-0 relative`}
         >
           {/* Toggle button */}
-          <button 
-            onClick={toggleSidebar} 
+          <button
+            onClick={toggleSidebar}
             className="text-white absolute right-4 top-4 hover:bg-[#2a3a4a] p-1 rounded-lg transition-colors"
           >
             {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
@@ -213,9 +213,8 @@ const polarAreaOptions = {
               <User className="text-gray-600" size={40} />
             </div>
             <div
-              className={`text-white space-y-3 w-full px-4 transition-opacity duration-300 ${
-                isSidebarOpen ? 'opacity-100' : 'opacity-0'
-              }`}
+              className={`text-white space-y-3 w-full px-4 transition-opacity duration-300 ${isSidebarOpen ? 'opacity-100' : 'opacity-0'
+                }`}
             >
               <div className="border-b border-gray-600 pb-2">
                 <p className="text-sm text-gray-400">Name</p>
@@ -241,7 +240,7 @@ const polarAreaOptions = {
         <div className="flex-1 p-6 overflow-y-auto min-h-0">
           <div className="bg-[#1e2a3a] rounded-lg p-8 min-h-[calc(100vh-8rem)]">
             <h2 className="text-white text-2xl font-bold">SKILLS OVERVIEW</h2>
-            
+
             {isLoading ? (
               <div className="flex items-center justify-center h-64">
                 <p className="text-white text-lg">Loading data...</p>
@@ -253,9 +252,9 @@ const polarAreaOptions = {
                   <h3 className="text-white text-lg font-semibold">Skills Distribution</h3>
                   <div className="flex-1 min-h-[500px]">
                     {data?.skills?.length > 0 ? (
-                      <PolarArea 
-                        data={polarAreaData} 
-                        options={polarAreaOptions} 
+                      <PolarArea
+                        data={polarAreaData}
+                        options={polarAreaOptions}
                       />
                     ) : (
                       <p className="text-gray-400">No skills data available</p>

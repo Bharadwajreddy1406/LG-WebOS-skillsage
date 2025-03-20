@@ -41,42 +41,139 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-b from-[#0c1929] to-slate-800 flex items-center justify-center p-4">
-      <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 space-y-6">
+    <div style={{
+      minHeight: "100vh", 
+      width: "100%", 
+      background: "linear-gradient(to bottom, #0c1929, #1e293b)",
+      display: "flex", 
+      alignItems: "center", 
+      justifyContent: "center", 
+      padding: "1rem"
+    }}>
+      <div style={{
+        maxWidth: "28rem", 
+        width: "100%", 
+        background: "white", 
+        borderRadius: "1rem", 
+        boxShadow: "0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04)",
+        padding: "2rem",
+        display: "flex",
+        flexDirection: "column",
+        gap: "1.5rem"
+      }}>
         {/* Logo container with improved animation */}
-        <div className="relative">
-          <div className="absolute inset-0 rounded-full filter blur-xl opacity-20"></div>
+        <div style={{ position: "relative" }}>
+          <div style={{
+            position: "absolute",
+            inset: 0,
+            borderRadius: "9999px",
+            filter: "blur(24px)",
+            opacity: "0.2"
+          }}></div>
           <img 
             src={logo} 
             alt="Skill Sage Logo" 
-            className="relative w-24 h-24 mx-auto transform transition-transform hover:scale-105 animate-pulse"
+            style={{
+              position: "relative",
+              width: "6rem",
+              height: "6rem",
+              margin: "0 auto",
+              transition: "transform 0.3s",
+              animation: "pulse 2s infinite",
+            }}
+            onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.05)"}
+            onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
           />
         </div>
 
         {/* Text content */}
-        <div className="text-center space-y-4">
-          <h1 className="text-3xl font-bold text-gray-900 tracking-tight animate-pulse">
+        <div style={{
+          textAlign: "center",
+          display: "flex",
+          flexDirection: "column",
+          gap: "1rem"
+        }}>
+          <h1 style={{
+            fontSize: "1.875rem",
+            lineHeight: "2.25rem",
+            fontWeight: "bold",
+            color: "#111827",
+            letterSpacing: "-0.025em",
+            animation: "pulse 2s infinite"
+          }}>
             SKILL SAGE
           </h1>
           
-          <div className="h-0.5 w-16 bg-gradient-to-r from-blue-500 to-blue-600 mx-auto"></div>
+          <div style={{
+            height: "0.125rem",
+            width: "4rem",
+            background: "linear-gradient(to right, #3b82f6, #2563eb)",
+            margin: "0 auto"
+          }}></div>
           
-          <p className="text-lg font-semibold text-gray-700">
+          <p style={{
+            fontSize: "1.125rem",
+            lineHeight: "1.75rem",
+            fontWeight: "600",
+            color: "#374151"
+          }}>
             In partnership with KMIT
           </p>
         </div>
 
         {/* Connection status with enhanced styling */}
-        <div className="flex justify-center">
+        <div style={{
+          display: "flex",
+          justifyContent: "center"
+        }}>
           {isConnected ? (
-            <div className="inline-flex items-center px-4 py-2 rounded-full bg-green-50 border border-green-200">
-              <div className="w-2 h-2 rounded-full bg-green-500 mr-2 animate-pulse"></div>
-              <span className="text-green-700 font-medium">Connected</span>
+            <div style={{
+              display: "inline-flex",
+              alignItems: "center",
+              paddingLeft: "1rem",
+              paddingRight: "1rem",
+              paddingTop: "0.5rem",
+              paddingBottom: "0.5rem",
+              borderRadius: "9999px",
+              backgroundColor: "#f0fdf4",
+              border: "1px solid #bbf7d0"
+            }}>
+              <div style={{
+                width: "0.5rem",
+                height: "0.5rem",
+                borderRadius: "9999px",
+                backgroundColor: "#22c55e",
+                marginRight: "0.5rem",
+                animation: "pulse 2s infinite"
+              }}></div>
+              <span style={{
+                color: "#15803d",
+                fontWeight: "500"
+              }}>Connected</span>
             </div>
           ) : (
-            <div className="inline-flex items-center px-4 py-2 rounded-full bg-red-50 border border-red-200">
-              <div className="w-2 h-2 rounded-full bg-red-500 mr-2"></div>
-              <span className="text-red-700 font-medium">Disconnected</span>
+            <div style={{
+              display: "inline-flex",
+              alignItems: "center",
+              paddingLeft: "1rem",
+              paddingRight: "1rem",
+              paddingTop: "0.5rem",
+              paddingBottom: "0.5rem",
+              borderRadius: "9999px",
+              backgroundColor: "#fef2f2",
+              border: "1px solid #fecaca"
+            }}>
+              <div style={{
+                width: "0.5rem",
+                height: "0.5rem",
+                borderRadius: "9999px",
+                backgroundColor: "#ef4444",
+                marginRight: "0.5rem"
+              }}></div>
+              <span style={{
+                color: "#b91c1c",
+                fontWeight: "500"
+              }}>Disconnected</span>
             </div>
           )}
         </div>
