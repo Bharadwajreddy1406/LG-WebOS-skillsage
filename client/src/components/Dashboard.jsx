@@ -76,7 +76,6 @@ function StudentDashboard({ rollNumber }) {
       setIsLoading(true)
       try {
         const response = await axios.get('http://localhost:4000/api/all-data')
-        const response = await axios.get('http://localhost:4000/api/all-data')
         console.log('Received data:', response.data)
         console.log('GitHub Projects:', response.data.githubProjects)
 
