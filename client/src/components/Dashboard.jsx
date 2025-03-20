@@ -11,6 +11,7 @@ import {
 import ChartDataLabels from 'chartjs-plugin-datalabels'
 import axios from 'axios'
 import logo from "../assets/-512x512.png"
+import webSocketService from "../utils/WebSocketService"
 
 // Register Chart.js + DataLabels plugin
 ChartJS.register(RadialLinearScale, ArcElement, ChartTooltip, ChartLegend, ChartDataLabels)
@@ -47,56 +48,34 @@ function StudentDashboard({ rollNumber }) {
     cgpa: "9.14",
   }
 
-  // WebSocket connection
+  // WebSocket connection using the shared service
   useEffect(() => {
-    let ws = null
-    let reconnectAttempt = null
-
-    const connectWebSocket = () => {
-      if (reconnectAttempt) {
-        clearTimeout(reconnectAttempt)
+    webSocketService.connect();
+    
+    setIsConnected(webSocketService.isConnected());
+    
+    // Add event listener for connection status
+    const unsubscribe = webSocketService.addEventListener((event) => {
+      if (event.type === 'connection') {
+        setIsConnected(event.status);
+        if (event.status) {
+          console.log("✅ Dashboard WebSocket connected");
+        }
       }
-
-      try {
-        ws = new WebSocket("ws://192.168.1.14:4000")
-        ws.onopen = () => {
-          console.log("✅ Dashboard WebSocket connected")
-          setIsConnected(true)
-        }
-        ws.onerror = (error) => {
-          console.error("WebSocket error:", error)
-          setIsConnected(false)
-        }
-        ws.onclose = () => {
-          console.log("Disconnected from WebSocket server")
-          setIsConnected(false)
-          reconnectAttempt = setTimeout(connectWebSocket, 3000)
-        }
-      } catch (error) {
-        console.error("WebSocket connection error:", error)
-        setIsConnected(false)
-      }
-    }
-
-    connectWebSocket()
-
+    });
+    
     return () => {
-      if (reconnectAttempt) {
-        clearTimeout(reconnectAttempt)
-      }
-      if (ws) {
-        ws.onclose = null
-        ws.close()
-      }
-    }
-  }, [])
+      unsubscribe();
+      // Note: We don't disconnect on unmount as this is the main view
+    };
+  }, []);
 
   // Data fetching
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true)
       try {
-        const response = await axios.get('http://192.168.1.14:4000/api/all-data')
+        const response = await axios.get('http://localhost:4000/api/all-data')
         console.log('Received data:', response.data)
         console.log('GitHub Projects:', response.data.githubProjects)
 

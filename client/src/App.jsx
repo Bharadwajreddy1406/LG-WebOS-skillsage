@@ -4,53 +4,37 @@ import { useState, useEffect } from "react"
 import "./App.css"
 import logo from "./assets/-512x512.png"
 import StudentDashboard from "./components/Dashboard"
+import webSocketService from "./utils/WebSocketService"
 
 function App() {
   const [isConnected, setIsConnected] = useState(false)
   const [rollNumber, setRollNumber] = useState(null)
 
   useEffect(() => {
-    console.log("Attempting to connect to WebSocket server...")
-    const ws = new WebSocket("ws://192.168.1.14:4000")
-
-    ws.onopen = () => {
-      console.log("✅ WebSocket connection established")
-      setIsConnected(true)
-    }
-
-    ws.onmessage = (event) => {
-      console.log("📩 Received WebSocket message:", event.data)
-      try {
-        const data = JSON.parse(event.data)
-        console.log("📋 Parsed message data:", data)
+    // Connect to WebSocket server if not already connected
+    webSocketService.connect();
+    
+    // Add event listener for WebSocket events
+    const unsubscribe = webSocketService.addEventListener((event) => {
+      if (event.type === 'connection') {
+        setIsConnected(event.status);
+      } else if (event.type === 'message') {
+        const data = event.data;
         
         // Check for rollUpdate message type
         if (data.type === "rollUpdate" && data.roll) {
-          console.log("🎯 Roll number received:", data.roll)
-          setRollNumber(data.roll)
+          console.log("🎯 Roll number received:", data.roll);
+          setRollNumber(data.roll);
         }
-      } catch (error) {
-        console.error("❌ Error parsing WebSocket message:", error)
       }
-    }
-
-    ws.onerror = (error) => {
-      console.error("WebSocket error:", error)
-      setIsConnected(false)
-    }
-
-    ws.onclose = () => {
-      console.log("Disconnected from WebSocket server")
-      setIsConnected(false)
-    }
-
+    });
+    
+    // Clean up event listener on component unmount
     return () => {
-      console.log("Cleaning up WebSocket connection...")
-      if (ws) {
-        ws.close()
-      }
-    }
-  }, [])
+      unsubscribe();
+      // Note: We don't disconnect here to maintain connection for Dashboard
+    };
+  }, []);
 
   if (rollNumber) {
     return <StudentDashboard rollNumber={rollNumber} />
