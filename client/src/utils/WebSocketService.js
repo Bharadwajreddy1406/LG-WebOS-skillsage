@@ -6,13 +6,14 @@
 
 class WebSocketService {
   constructor() {
+    // Hardcoded WebSocket URL for Docker environment
+    this.url = "ws://100.29.172.241:4000/";
     this.socket = null;
     this._isConnected = false;
     this.listeners = [];
     this.reconnectAttempts = 0;
     this.reconnectInterval = null;
     this.manualClose = false;
-    this.url = "ws://localhost:4000";
   }
 
   // Connect to WebSocket server

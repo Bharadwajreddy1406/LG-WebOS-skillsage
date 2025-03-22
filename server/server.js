@@ -12,7 +12,7 @@ const PORT = process.env.PORT || 4000;
 
 // Middleware
 app.use(cors({
-    origin: true,
+    origin: true,  // Or specify your EC2 instance URL
     credentials: true,
 }));
 app.use(express.json());
@@ -33,13 +33,26 @@ const wss = new WebSocket.Server({ server });
 // Map to store clients with their IDs
 const clients = new Map();
 
+// Add a heartbeat mechanism to keep WebSocket connections alive
+function heartbeat() {
+    this.isAlive = true;
+}
+
 // WebSocket connection handling
 wss.on('connection', (ws, req) => {
+    // Set up heartbeat mechanism
+    ws.isAlive = true;
+    ws.on('pong', heartbeat);
+    
     // Generate a unique ID for this client
     const clientId = uuidv4();
     
-    // Store IP address information
+    // Get client IP
     const ip = req.socket.remoteAddress;
+    const headers = req.headers;
+    console.log(`Connection attempt from: ${ip}`);
+    console.log(`Origin: ${headers.origin}`);
+    console.log(`User-Agent: ${headers['user-agent']}`);
     
     // Store client connection with metadata
     clients.set(clientId, {
@@ -95,6 +108,23 @@ wss.on('connection', (ws, req) => {
         clients.delete(clientId);
         console.log(`Remaining clients: ${clients.size}`);
     });
+});
+
+// Check for dead connections every 30 seconds
+const interval = setInterval(() => {
+    wss.clients.forEach((ws) => {
+        if (ws.isAlive === false) {
+            console.log("Terminating dead connection");
+            return ws.terminate();
+        }
+        
+        ws.isAlive = false;
+        ws.ping();
+    });
+}, 30000);
+
+wss.on('close', function close() {
+    clearInterval(interval);
 });
 
 // Function to send message to a specific client
@@ -254,8 +284,19 @@ app.get('/update-data', (req, res) => {
     }
 });
 
+// Add a simple status endpoint for diagnostics
+app.get('/api/status', (req, res) => {
+    res.json({
+        status: 'ok',
+        timestamp: new Date(),
+        clientsConnected: clients.size,
+        websocketServer: 'running'
+    });
+});
+
 // Start the server
-server.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
-    console.log(`WebSocket server is running on ws://localhost:${PORT}`);
+server.listen(PORT, "192.168.1.12", () => {
+    console.log(`Server is running on http://192.168.1.12:${PORT}`);
+    console.log(`WebSocket server is running on ws://192.168.1.12:${PORT}`);
+    console.log(`CORS configuration: ${JSON.stringify(cors)}`);
 });

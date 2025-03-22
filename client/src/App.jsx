@@ -11,6 +11,13 @@ function App() {
   const [rollNumber, setRollNumber] = useState(null)
 
   useEffect(() => {
+    // Set viewport settings for TV display
+    document.querySelector('meta[name="viewport"]')?.remove();
+    const viewportMeta = document.createElement('meta');
+    viewportMeta.name = 'viewport';
+    viewportMeta.content = 'width=1920, height=1080, initial-scale=1.0';
+    document.getElementsByTagName('head')[0].appendChild(viewportMeta);
+    
     // Connect to WebSocket server if not already connected
     webSocketService.connect();
     
@@ -40,142 +47,154 @@ function App() {
     return <StudentDashboard rollNumber={rollNumber} />
   }
 
+  // TV-friendly styling with safe area consideration
   return (
     <div style={{
-      minHeight: "100vh", 
-      width: "100%", 
+      height: "1080px",
+      width: "1920px", 
       background: "linear-gradient(to bottom, #0c1929, #1e293b)",
       display: "flex", 
       alignItems: "center", 
       justifyContent: "center", 
-      padding: "1rem"
+      padding: "0",
+      overflow: "hidden",
+      position: "relative",
+      margin: "0"
     }}>
+      {/* TV safe area container (90% of the screen) */}
       <div style={{
-        maxWidth: "28rem", 
-        width: "100%", 
-        background: "white", 
-        borderRadius: "1rem", 
-        boxShadow: "0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04)",
-        padding: "2rem",
+        width: "80%",
+        height: "80%",
         display: "flex",
-        flexDirection: "column",
-        gap: "1.5rem"
+        alignItems: "center",
+        justifyContent: "center"
       }}>
-        {/* Logo container with improved animation */}
-        <div style={{ position: "relative" }}>
-          <div style={{
-            position: "absolute",
-            inset: 0,
-            borderRadius: "9999px",
-            filter: "blur(24px)",
-            opacity: "0.2"
-          }}></div>
-          <img 
-            src={logo} 
-            alt="Skill Sage Logo" 
-            style={{
-              position: "relative",
-              width: "6rem",
-              height: "6rem",
-              margin: "0 auto",
-              transition: "transform 0.3s",
-              animation: "pulse 2s infinite",
-            }}
-            onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.05)"}
-            onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
-          />
-        </div>
-
-        {/* Text content */}
         <div style={{
-          textAlign: "center",
+          width: "800px", 
+          background: "white", 
+          borderRadius: "2rem", 
+          boxShadow: "0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04)",
+          padding: "3rem",
           display: "flex",
           flexDirection: "column",
-          gap: "1rem"
+          gap: "3rem"
         }}>
-          <h1 style={{
-            fontSize: "1.875rem",
-            lineHeight: "2.25rem",
-            fontWeight: "bold",
-            color: "#111827",
-            letterSpacing: "-0.025em",
-            animation: "pulse 2s infinite"
-          }}>
-            SKILL SAGE
-          </h1>
-          
-          <div style={{
-            height: "0.125rem",
-            width: "4rem",
-            background: "linear-gradient(to right, #3b82f6, #2563eb)",
-            margin: "0 auto"
-          }}></div>
-          
-          <p style={{
-            fontSize: "1.125rem",
-            lineHeight: "1.75rem",
-            fontWeight: "600",
-            color: "#374151"
-          }}>
-            In partnership with KMIT
-          </p>
-        </div>
+          {/* Logo container with improved size for TV */}
+          <div style={{ position: "relative" }}>
+            <div style={{
+              position: "absolute",
+              inset: 0,
+              borderRadius: "9999px",
+              filter: "blur(24px)",
+              opacity: "0.2"
+            }}></div>
+            <img 
+              src={logo} 
+              alt="Skill Sage Logo" 
+              style={{
+                position: "relative",
+                width: "200px",
+                height: "200px",
+                margin: "0 auto",
+                transition: "transform 0.3s",
+                animation: "pulse 2s infinite",
+              }}
+            />
+          </div>
 
-        {/* Connection status with enhanced styling */}
-        <div style={{
-          display: "flex",
-          justifyContent: "center"
-        }}>
-          {isConnected ? (
-            <div style={{
-              display: "inline-flex",
-              alignItems: "center",
-              paddingLeft: "1rem",
-              paddingRight: "1rem",
-              paddingTop: "0.5rem",
-              paddingBottom: "0.5rem",
-              borderRadius: "9999px",
-              backgroundColor: "#f0fdf4",
-              border: "1px solid #bbf7d0"
+          {/* Text content with larger fonts for TV */}
+          <div style={{
+            textAlign: "center",
+            display: "flex",
+            flexDirection: "column",
+            gap: "2rem"
+          }}>
+            <h1 style={{
+              fontSize: "4rem",
+              lineHeight: "4.5rem",
+              fontWeight: "bold",
+              color: "#111827",
+              letterSpacing: "-0.025em",
+              animation: "pulse 2s infinite"
             }}>
-              <div style={{
-                width: "0.5rem",
-                height: "0.5rem",
-                borderRadius: "9999px",
-                backgroundColor: "#22c55e",
-                marginRight: "0.5rem",
-                animation: "pulse 2s infinite"
-              }}></div>
-              <span style={{
-                color: "#15803d",
-                fontWeight: "500"
-              }}>Connected</span>
-            </div>
-          ) : (
+              SKILL SAGE
+            </h1>
+            
             <div style={{
-              display: "inline-flex",
-              alignItems: "center",
-              paddingLeft: "1rem",
-              paddingRight: "1rem",
-              paddingTop: "0.5rem",
-              paddingBottom: "0.5rem",
-              borderRadius: "9999px",
-              backgroundColor: "#fef2f2",
-              border: "1px solid #fecaca"
+              height: "0.25rem",
+              width: "8rem",
+              background: "linear-gradient(to right, #3b82f6, #2563eb)",
+              margin: "0 auto"
+            }}></div>
+            
+            <p style={{
+              fontSize: "2.5rem",
+              lineHeight: "3rem",
+              fontWeight: "600",
+              color: "#374151"
             }}>
+              In partnership with KMIT
+            </p>
+          </div>
+
+          {/* Connection status with larger sizing for TV */}
+          <div style={{
+            display: "flex",
+            justifyContent: "center"
+          }}>
+            {isConnected ? (
               <div style={{
-                width: "0.5rem",
-                height: "0.5rem",
+                display: "inline-flex",
+                alignItems: "center",
+                paddingLeft: "2rem",
+                paddingRight: "2rem",
+                paddingTop: "1rem",
+                paddingBottom: "1rem",
                 borderRadius: "9999px",
-                backgroundColor: "#ef4444",
-                marginRight: "0.5rem"
-              }}></div>
-              <span style={{
-                color: "#b91c1c",
-                fontWeight: "500"
-              }}>Disconnected</span>
-            </div>
-          )}
+                backgroundColor: "#f0fdf4",
+                border: "2px solid #bbf7d0"
+              }}>
+                <div style={{
+                  width: "1rem",
+                  height: "1rem",
+                  borderRadius: "9999px",
+                  backgroundColor: "#22c55e",
+                  marginRight: "1rem",
+                  animation: "pulse 2s infinite"
+                }}></div>
+                <span style={{
+                  color: "#15803d",
+                  fontWeight: "500",
+                  fontSize: "2rem"
+                }}>Connected</span>
+              </div>
+            ) : (
+              <div style={{
+                display: "inline-flex",
+                alignItems: "center",
+                paddingLeft: "2rem",
+                paddingRight: "2rem",
+                paddingTop: "1rem",
+                paddingBottom: "1rem",
+                borderRadius: "9999px",
+                backgroundColor: "#fef2f2",
+                border: "2px solid #fecaca"
+              }}>
+                <div style={{
+                  width: "1rem",
+                  height: "1rem",
+                  borderRadius: "9999px",
+                  backgroundColor: "#ef4444",
+                  marginRight: "1rem"
+                }}></div>
+                <span style={{
+                  color: "#b91c1c",
+                  fontWeight: "500",
+                  fontSize: "2rem"
+                }}>Disconnected</span>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

@@ -75,7 +75,9 @@ function StudentDashboard({ rollNumber }) {
     const fetchData = async () => {
       setIsLoading(true)
       try {
-        const response = await axios.get('http://localhost:4000/api/all-data')
+        // Use dynamic server URL directly from the env variable
+        const serverUrl = import.meta.env.VITE_SERVER_URL;
+        const response = await axios.get(`http://100.29.172.241:4000/api/all-data`);
         console.log('Received data:', response.data)
         console.log('GitHub Projects:', response.data.githubProjects)
 
@@ -109,7 +111,7 @@ function StudentDashboard({ rollNumber }) {
     ],
   }
 
-  // Updated polarAreaOptions
+  // Updated polarAreaOptions for TV display
   const polarAreaOptions = {
     responsive: true,
     maintainAspectRatio: false,
@@ -123,17 +125,22 @@ function StudentDashboard({ rollNumber }) {
         labels: {
           color: "#fff",        // White text for legend
           font: {
-            size: 12,
+            size: window.innerWidth >= 1920 ? 18 : 12, // Larger font for TV
           },
-          padding: 20,
+          padding: window.innerWidth >= 1920 ? 30 : 20,
           usePointStyle: true,
-          boxWidth: 10,
+          boxWidth: window.innerWidth >= 1920 ? 15 : 10,
         },
       },
       tooltip: {
+        titleFont: {
+          size: window.innerWidth >= 1920 ? 18 : 14,
+        },
+        bodyFont: {
+          size: window.innerWidth >= 1920 ? 16 : 12,
+        },
         callbacks: {
           label: (context) => {
-            // Show skill value in the tooltip (append "%" if needed)
             return `${context.label}: ${context.raw}%`;
           },
         },
@@ -142,17 +149,16 @@ function StudentDashboard({ rollNumber }) {
     scales: {
       r: {
         beginAtZero: true,
-        max: 100,              // Adjust if your skills aren't out of 100
-        // This places skill names around the circle (pointLabels)
+        max: 100,
         pointLabels: {
           display: true,
-          color: "#fff",        // White text around the perimeter
+          color: "#fff",
           font: {
-            size: 12,
+            size: window.innerWidth >= 1920 ? 16 : 12,
           },
         },
         ticks: {
-          display: false,       // Hide numeric ticks around the circle
+          display: false,
         },
         grid: {
           color: "rgba(255, 255, 255, 0.1)",

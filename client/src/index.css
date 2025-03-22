@@ -67,3 +67,29 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+@media (min-width: 1024px) {
+  body {
+    font-size: 1.2rem;
+  }
+  h1 {
+    font-size: 4em;
+  }
+  button {
+    padding: 0.8em 1.5em;
+    font-size: 1.2em;
+  }
+}
+
+@media (min-width: 1440px) {
+  body {
+    font-size: 1.5rem;
+  }
+  h1 {
+    font-size: 5em;
+  }
+  button {
+    padding: 1em 2em;
+    font-size: 1.5em;
+  }
+}

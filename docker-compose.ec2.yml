@@ -1,0 +1,15 @@
+version: "3"
+services:
+  server:
+    image: yourdockerhubusername/myproject-server:latest
+    ports:
+      - "4000:4000"
+  client:
+    image: yourdockerhubusername/myproject-client:latest
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_WS_URL=ws://server:4000
+      - VITE_SERVER_URL=http://server:4000
+    depends_on:
+      - server

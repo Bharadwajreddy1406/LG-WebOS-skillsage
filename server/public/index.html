@@ -553,41 +553,48 @@
                 });
         }
         
-        // Test WebSocket connection (repurposed as "restart server" for UI)
-        function testWebSocket() {
+        // New helper: creates a new admin WebSocket connection
+        function createNewAdminSocket() {
             const wsStatus = document.getElementById('wsStatus');
-            wsStatus.innerHTML = `<span class="inline-block bg-yellow-100 text-yellow-800 rounded-full px-3 py-1">
-                <i class="fas fa-sync fa-spin text-yellow-500 text-xs mr-2"></i>Connecting...
-            </span>`;
+            window.adminSocket = new WebSocket(`ws://${window.location.host}`);
             
-            // Create WebSocket connection
-            const socket = new WebSocket(`ws://${window.location.host}`);
-            
-            socket.onopen = function(e) {
+            window.adminSocket.onopen = function(e) {
                 wsStatus.innerHTML = `<span class="inline-block bg-green-100 text-green-800 rounded-full px-3 py-1">
-                    <i class="fas fa-circle text-green-500 text-xs mr-2"></i>Connected
-                </span>`;
-                
-                // Refresh client list
+                        <i class="fas fa-circle text-green-500 text-xs mr-2"></i>Connected
+                    </span>`;
                 setTimeout(fetchClients, 500);
-                document.getElementById('status').innerHTML = `<span class="text-green-600">Server connection established</span>`;
+                document.getElementById('status').innerHTML = `<span class="text-green-600">Server connection restarted</span>`;
             };
             
-            socket.onmessage = function(event) {
+            window.adminSocket.onmessage = function(event) {
                 // ...existing code...
             };
             
-            socket.onclose = function(event) {
+            window.adminSocket.onerror = function(error) {
                 wsStatus.innerHTML = `<span class="inline-block bg-red-100 text-red-800 rounded-full px-3 py-1">
-                    <i class="fas fa-exclamation-circle text-red-500 text-xs mr-2"></i>Disconnected
-                </span>`;
+                        <i class="fas fa-exclamation-circle text-red-500 text-xs mr-2"></i>Error
+                    </span>`;
             };
             
-            socket.onerror = function(error) {
+            window.adminSocket.onclose = function(event) {
                 wsStatus.innerHTML = `<span class="inline-block bg-red-100 text-red-800 rounded-full px-3 py-1">
-                    <i class="fas fa-exclamation-circle text-red-500 text-xs mr-2"></i>Error
-                </span>`;
+                        <i class="fas fa-exclamation-circle text-red-500 text-xs mr-2"></i>Disconnected
+                    </span>`;
             };
+        }
+        
+        // Updated testWebSocket function to restart connection only after previous socket fully closes
+        function testWebSocket() {
+            const wsStatus = document.getElementById('wsStatus');
+            if (window.adminSocket && window.adminSocket.readyState !== WebSocket.CLOSED) {
+                console.log("Restarting WebSocket connection...");
+                window.adminSocket.onclose = function(event) {
+                    createNewAdminSocket();
+                };
+                window.adminSocket.close();
+            } else {
+                createNewAdminSocket();
+            }
         }
         
         // Refresh the client list periodically

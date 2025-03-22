@@ -1,0 +1,17 @@
+version: '3'
+services:
+  server:
+    build: ./server
+    image: pradyumna2003/server-lgtv
+    ports:
+      - "4000:4000"
+  client:
+    build: ./client
+    image: pradyumna2003/client-lgtv
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_WS_URL=ws://server:4000
+      - VITE_SERVER_URL=http://server:4000
+    depends_on:
+      - server
