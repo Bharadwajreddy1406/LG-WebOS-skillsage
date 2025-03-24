@@ -6,7 +6,7 @@
 class WebSocketService {
     constructor() {
         // Simple hardcoded WebSocket URL
-        this.url = "ws://192.168.1.12:4000/";
+        this.url = "ws://localhost:4000/";
         
         console.log(`WebSocket URL settt to: ${this.url}`);
         console.log(`Running on host: ${window.location.hostname}`);

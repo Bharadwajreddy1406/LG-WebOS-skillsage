@@ -125,7 +125,7 @@ function fetchStudentData() {
     updateStudentProfile();
     
     // Simple hardcoded API URL
-    const apiUrl = 'http://192.168.1.12:4000/api/all-data';
+    const apiUrl = 'http://localhost:4000/api/all-data';
     console.log(`Fetching data from: ${apiUrl}`);
     
     fetch(apiUrl)

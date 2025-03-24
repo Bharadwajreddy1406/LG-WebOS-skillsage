@@ -5,6 +5,8 @@ const path = require('path');
 const cors = require('cors');
 const { v4: uuidv4 } = require('uuid');
 const router = require('./routes');
+const { resetDatabase } = require('./controller');
+require('./db'); // Initialize database connection
 
 // Initialize Express app
 const app = express();
@@ -294,9 +296,12 @@ app.get('/api/status', (req, res) => {
     });
 });
 
+// Add reset database endpoint
+app.post('/api/reset-database', resetDatabase);
+
 // Start the server
-server.listen(PORT, "192.168.1.12", () => {
-    console.log(`Server is running on http://192.168.1.12:${PORT}`);
-    console.log(`WebSocket server is running on ws://192.168.1.12:${PORT}`);
+server.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
+    console.log(`WebSocket server is running on ws://localhost:${PORT}`);
     console.log(`CORS configuration: ${JSON.stringify(cors)}`);
 });
