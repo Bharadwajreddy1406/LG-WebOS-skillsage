@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .container {
+            background-color: #f5f5f5;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"], select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .status {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 4px;
+            background-color: #e7f3fe;
+            border-left: 6px solid #2196F3;
+        }
+        .connections {
+            margin-top: 20px;
+        }
+        .client-list {
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .client-item {
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+        }
+        .client-item:hover {
+            background-color: #f0f0f0;
+        }
+        .client-item.selected {
+            background-color: #e0f7fa;
+        }
+        .client-item-id {
+            font-weight: bold;
+            color: #0277bd;
+        }
+        .client-item-details {
+            font-size: 12px;
+            color: #666;
+        }
+        .refresh-btn {
+            background-color: #2196F3;
+        }
+        .refresh-btn:hover {
+            background-color: #0b7dda;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Admin Control Panel</h1>
+        
+        <div class="form-group">
+            <button id="refreshClients" class="refresh-btn">Refresh Client List</button>
+            <span id="clientCount">No clients connected</span>
+        </div>
+        
+        <div class="client-list" id="clientList">
+            <div class="client-item">No clients connected</div>
+        </div>
+        
+        <div class="form-group">
+            <label for="targetClient">Target Client:</label>
+            <select id="targetClient">
+                <option value="">All Clients (Broadcast)</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="rollNumber">Roll Number:</label>
+            <input type="text" id="rollNumber" placeholder="Enter roll number">
+        </div>
+        
+        <button onclick="sendRoll()">Send Roll Number</button>
+        
+        <hr>
+        
+        <div class="form-group">
+            <label for="dataPayload">Data Payload:</label>
+            <input type="text" id="dataPayload" placeholder="Enter data payload">
+        </div>
+        
+        <button onclick="updateData()">Update Data</button>
+        
+        <div class="status" id="status">Status: Ready</div>
+        
+        <div class="connections">
+            <h3>WebSocket Test</h3>
+            <p>You can test WebSocket communication here:</p>
+            <button onclick="testWebSocket()">Test WebSocket Connection</button>
+            <div id="wsStatus"></div>
+        </div>
+    </div>
+
+    <script>
+        let clients = [];
+        let selectedClientId = '';
+        
+        // Load clients when page loads
+        document.addEventListener('DOMContentLoaded', fetchClients);
+        
+        // Function to fetch clients
+        function fetchClients() {
+            fetch('/clients')
+                .then(response => response.json())
+                .then(data => {
+                    clients = data.clients;
+                    document.getElementById('clientCount').innerText = `${data.count} clients connected`;
+                    
+                    // Update client list
+                    const clientListEl = document.getElementById('clientList');
+                    const targetClientEl = document.getElementById('targetClient');
+                    
+                    // Clear previous options except the broadcast option
+                    while (targetClientEl.options.length > 1) {
+                        targetClientEl.remove(1);
+                    }
+                    
+                    // Clear client list
+                    clientListEl.innerHTML = '';
+                    
+                    if (data.clients.length === 0) {
+                        clientListEl.innerHTML = '<div class="client-item">No clients connected</div>';
+                    } else {
+                        data.clients.forEach(client => {
+                            // Add to visual list
+                            const clientItem = document.createElement('div');
+                            clientItem.className = 'client-item';
+                            clientItem.dataset.id = client.id;
+                            
+                            if (client.id === selectedClientId) {
+                                clientItem.className += ' selected';
+                            }
+                            
+                            const connectTime = new Date(client.connectTime);
+                            const lastActive = new Date(client.lastActive);
+                            
+                            clientItem.innerHTML = `
+                                <div class="client-item-id">${client.id}</div>
+                                <div class="client-item-details">
+                                    IP: ${client.ip}<br>
+                                    Connected: ${connectTime.toLocaleTimeString()}<br>
+                                    Last Active: ${lastActive.toLocaleTimeString()}
+                                </div>
+                            `;
+                            clientItem.onclick = () => selectClient(client.id);
+                            clientListEl.appendChild(clientItem);
+                            
+                            // Add to dropdown
+                            const option = document.createElement('option');
+                            option.value = client.id;
+                            option.text = `Client: ${client.id.substring(0, 8)}...`;
+                            targetClientEl.appendChild(option);
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching clients:', error);
+                    document.getElementById('status').innerText = `Error: Failed to fetch clients`;
+                });
+        }
+        
+        // Function to select client
+        function selectClient(clientId) {
+            selectedClientId = clientId;
+            
+            // Update UI
+            document.querySelectorAll('.client-item').forEach(item => {
+                if (item.dataset.id === clientId) {
+                    item.classList.add('selected');
+                } else {
+                    item.classList.remove('selected');
+                }
+            });
+            
+            // Update dropdown
+            document.getElementById('targetClient').value = clientId;
+            
+            document.getElementById('status').innerText = `Selected client: ${clientId}`;
+        }
+        
+        // Refresh client list button
+        document.getElementById('refreshClients').addEventListener('click', fetchClients);
+        
+        // Function to send roll number
+        function sendRoll() {
+            const roll = document.getElementById('rollNumber').value.trim();
+            const targetClient = document.getElementById('targetClient').value;
+            
+            if (!roll) {
+                alert('Please enter a roll number');
+                return;
+            }
+            
+            let url = `/send?roll=${encodeURIComponent(roll)}`;
+            if (targetClient) {
+                url += `&clientId=${encodeURIComponent(targetClient)}`;
+            }
+            
+            fetch(url)
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('status').innerText = `Status: ${data}`;
+                })
+                .catch(error => {
+                    document.getElementById('status').innerText = `Error: ${error.message}`;
+                });
+        }
+
+        // Function to update data
+        function updateData() {
+            const data = document.getElementById('dataPayload').value.trim();
+            const targetClient = document.getElementById('targetClient').value;
+            
+            if (!data) {
+                alert('Please enter data payload');
+                return;
+            }
+            
+            let url = `/update-data?data=${encodeURIComponent(data)}`;
+            if (targetClient) {
+                url += `&clientId=${encodeURIComponent(targetClient)}`;
+            }
+            
+            fetch(url)
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('status').innerText = `Status: ${data}`;
+                })
+                .catch(error => {
+                    document.getElementById('status').innerText = `Error: ${error.message}`;
+                });
+        }
+        
+        // Test WebSocket connection
+        function testWebSocket() {
+            const wsStatus = document.getElementById('wsStatus');
+            wsStatus.innerHTML = "Connecting...";
+            
+            // Create WebSocket connection
+            const socket = new WebSocket(`ws://${window.location.host}`);
+            
+            socket.onopen = function(e) {
+                wsStatus.innerHTML = "Connected to WebSocket server!";
+            };
+            
+            socket.onmessage = function(event) {
+                const data = JSON.parse(event.data);
+                wsStatus.innerHTML += `<br>Received: ${JSON.stringify(data)}`;
+                
+                // If we received a clientId, let's use it to identify this connection
+                if (data.type === 'connection') {
+                    wsStatus.innerHTML += `<br>Assigned Client ID: ${data.clientId}`;
+                    
+                    // Refresh the client list to show this new connection
+                    setTimeout(fetchClients, 500);
+                }
+            };
+            
+            socket.onclose = function(event) {
+                wsStatus.innerHTML += "<br>Connection closed";
+            };
+            
+            socket.onerror = function(error) {
+                wsStatus.innerHTML += `<br>Error: ${error.message}`;
+            };
+        }
+        
+        // Refresh the client list periodically
+        setInterval(fetchClients, 10000);
+    </script>
+</body>
+</html>
